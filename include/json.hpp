@@ -60,7 +60,7 @@ namespace json
         template <class T>
         inline std::vector<uint32_t> toUtf32(const T& text)
         {
-            return toUtf32(text.begin(), text.end());
+            return toUtf32(std::begin(text), std::end(text));
         }
 
         inline std::string fromUtf32(uint32_t c)
@@ -123,9 +123,10 @@ namespace json
             return result;
         }
 
-        inline std::string fromUtf32(const std::vector<uint32_t>& text)
+        template <class T>
+        inline std::string fromUtf32(const T& text)
         {
-            return fromUtf32(text.begin(), text.end());
+            return fromUtf32(std::begin(text), std::end(text));
         }
     } // namespace utf8
 
@@ -915,4 +916,3 @@ namespace json
 } // namespace json
 
 #endif // JSON_HPP
-
