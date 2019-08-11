@@ -484,6 +484,13 @@ namespace json
         inline Type getType() const noexcept { return type; }
 
         template <typename T, typename std::enable_if<std::is_same<T, std::string>::value>::type* = nullptr>
+        std::string& as()
+        {
+            type = Type::String;
+            return stringValue;
+        }
+
+        template <typename T, typename std::enable_if<std::is_same<T, std::string>::value>::type* = nullptr>
         const std::string& as() const
         {
             assert(type == Type::String);
@@ -516,28 +523,28 @@ namespace json
         }
 
         template <typename T, typename std::enable_if<std::is_same<T, Object>::value>::type* = nullptr>
-        inline Object& as()
+        inline T& as()
         {
             type = Type::Object;
             return objectValue;
         }
 
         template <typename T, typename std::enable_if<std::is_same<T, Object>::value>::type* = nullptr>
-        inline const Object& as() const
+        inline const T& as() const
         {
             assert(type == Type::Object);
             return objectValue;
         }
 
         template <typename T, typename std::enable_if<std::is_same<T, Array>::value>::type* = nullptr>
-        inline Array& as() noexcept
+        inline T& as() noexcept
         {
             type = Type::Array;
             return arrayValue;
         }
 
         template <typename T, typename std::enable_if<std::is_same<T, Array>::value>::type* = nullptr>
-        inline const Array& as() const
+        inline const T& as() const
         {
             assert(type == Type::Array);
             return arrayValue;
