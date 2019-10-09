@@ -875,7 +875,7 @@ namespace json
         }
 
         template <class T>
-        Data(const T& data)
+        explicit Data(const T& data)
         {
             std::vector<uint32_t> str;
 
