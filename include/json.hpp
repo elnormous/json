@@ -357,6 +357,8 @@ namespace json
                 ++iterator;
                 continue;
             }
+            else if (*iterator == '\0')
+                break;
             else
                 throw std::runtime_error("Unknown character");
 
@@ -872,17 +874,18 @@ namespace json
         {
         }
 
-        Data(const std::vector<uint8_t>& data)
+        template <class T>
+        Data(const T& data)
         {
             std::vector<uint32_t> str;
 
             // BOM
-            if (data.size() >= 3 &&
-                std::equal(data.begin(), data.begin() + 3,
+            if (std::distance(std::begin(data), std::end(data)) >= 3 &&
+                std::equal(std::begin(data), std::begin(data) + 3,
                            UTF8_BOM.begin()))
             {
                 bom = true;
-                str = utf8::toUtf32(data.begin() + 3, data.end());
+                str = utf8::toUtf32(std::begin(data) + 3, std::end(data));
             }
             else
             {
