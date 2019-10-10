@@ -19,7 +19,7 @@ namespace
             catch (std::exception& e)
             {
                 std::cerr << e.what() << '\n';
-                result = EXIT_FAILURE;
+                result = false;
             }
         }
 
