@@ -73,14 +73,33 @@ namespace
             throw std::runtime_error("Expected a string");
     }
 
-    void testObject()
+    void testEmptyObject()
     {
         json::Data d("{}");
         if (d.getType() != json::Value::Type::Object)
             throw std::runtime_error("Expected an object");
+
+
     }
 
-    void testArray()
+    void testObject()
+    {
+        json::Data d;
+        d = json::Data("{\"a\":\"b\"}");
+        if (d.getType() != json::Value::Type::Object)
+            throw std::runtime_error("Expected an object");
+
+        if (!d.hasMember("a"))
+            throw std::runtime_error("Expected a member \"a\"");
+
+        if (d["a"].getType() != json::Value::Type::String)
+            throw std::runtime_error("Expected a string member");
+
+        if (d["a"].as<std::string>() != "b")
+        throw std::runtime_error("Expected a value \"b\"");
+    }
+
+    void testEmptyArray()
     {
         json::Data d("[]");
         if (d.getType() != json::Value::Type::Array)
@@ -88,8 +107,11 @@ namespace
 
         if (!d.as<json::Value::Array>().empty())
             throw std::runtime_error("Expected an empty array");
+    }
 
-        d = json::Data("[1, 2]");
+    void testArray()
+    {
+        json::Data d = json::Data("[1, 2]");
         if (d.getType() != json::Value::Type::Array)
             throw std::runtime_error("Expected an array");
 
@@ -109,7 +131,9 @@ int main()
     testRunner.run(testFloat);
     testRunner.run(testBoolean);
     testRunner.run(testString);
+    testRunner.run(testEmptyObject);
     testRunner.run(testObject);
+    testRunner.run(testEmptyArray);
     testRunner.run(testArray);
 
     if (testRunner.getResult())
