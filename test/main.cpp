@@ -6,6 +6,29 @@
 
 namespace
 {
+    class TestRunner
+    {
+    public:
+        template <class T, class ...Args>
+        void run(T test, Args ...args)
+        {
+            try
+            {
+                test(args...);
+            }
+            catch (std::exception& e)
+            {
+                std::cerr << e.what() << '\n';
+                result = EXIT_FAILURE;
+            }
+        }
+
+        bool getResult() const noexcept { return result; }
+
+    private:
+        bool result = true;
+    };
+
     void testNull()
     {
         json::Data d("null");
@@ -70,22 +93,17 @@ namespace
 
 int main()
 {
-    try
-    {
-        testNull();
-        testInteger();
-        testFloat();
-        testBoolean();
-        testString();
-        testObject();
-        testArray();
-    }
-    catch (std::exception& e)
-    {
-        std::cerr << e.what() << '\n';
-        return EXIT_FAILURE;
-    }
+    TestRunner testRunner;
+    testRunner.run(testNull);
+    testRunner.run(testInteger);
+    testRunner.run(testFloat);
+    testRunner.run(testBoolean);
+    testRunner.run(testString);
+    testRunner.run(testObject);
+    testRunner.run(testArray);
 
-    std::cout << "Success\n";
-    return EXIT_SUCCESS;
+    if (testRunner.getResult())
+        std::cout << "Success\n";
+
+    return testRunner.getResult() ? EXIT_SUCCESS : EXIT_FAILURE;
 }
