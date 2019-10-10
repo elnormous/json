@@ -88,6 +88,16 @@ namespace
 
         if (!d.as<json::Value::Array>().empty())
             throw std::runtime_error("Expected an empty array");
+
+        d = json::Data("[1, 2]");
+        if (d.getType() != json::Value::Type::Array)
+            throw std::runtime_error("Expected an array");
+
+        if (d.as<json::Value::Array>().size() != 2)
+            throw std::runtime_error("Expected an array with 2 elements");
+
+        if (d[0].as<int>() != 1 || d[1].as<int>() != 2)
+            throw std::runtime_error("Expected elements 1 and 2");
     }
 }
 
