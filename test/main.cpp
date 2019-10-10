@@ -56,6 +56,16 @@ namespace
         if (d.getType() != json::Value::Type::Object)
             throw std::runtime_error("Expected an object");
     }
+
+    void testArray()
+    {
+        json::Data d("[]");
+        if (d.getType() != json::Value::Type::Array)
+            throw std::runtime_error("Expected an array");
+
+        if (!d.as<json::Value::Array>().empty())
+            throw std::runtime_error("Expected an empty array");
+    }
 }
 
 int main()
@@ -68,6 +78,7 @@ int main()
         testBoolean();
         testString();
         testObject();
+        testArray();
     }
     catch (std::exception& e)
     {
