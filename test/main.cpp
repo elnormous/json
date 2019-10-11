@@ -78,8 +78,6 @@ namespace
         json::Data d("{}");
         if (d.getType() != json::Value::Type::Object)
             throw std::runtime_error("Expected an object");
-
-
     }
 
     void testObject()
