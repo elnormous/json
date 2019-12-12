@@ -14,10 +14,10 @@ all: CXXFLAGS+=-DDEBUG -g
 endif
 
 $(EXECUTABLE): $(OBJECTS)
-	$(CXX) $(OBJECTS) $(LDFLAGS) -o $@
+	$(CXX) $(OBJECTS) $(LDFLAGS) -o $@ -fprofile-arcs -ftest-coverage
 
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) $< -o $@
+	$(CXX) $(CXXFLAGS) $< -o $@ -fprofile-arcs -ftest-coverage
 
 .PHONY: clean
 clean:
