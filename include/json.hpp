@@ -131,7 +131,7 @@ namespace json
         }
     } // namespace utf8
 
-    const std::vector<uint8_t> UTF8_BOM = {0xEF, 0xBB, 0xBF};
+    constexpr uint8_t UTF8_BOM[] = {0xEF, 0xBB, 0xBF};
 
     inline void encodeString(std::vector<uint8_t>& data,
                              const std::vector<uint32_t>& str)
@@ -886,7 +886,7 @@ namespace json
             // BOM
             if (std::distance(std::begin(data), std::end(data)) >= 3 &&
                 std::equal(std::begin(data), std::begin(data) + 3,
-                           UTF8_BOM.begin()))
+                           std::begin(UTF8_BOM)))
             {
                 bom = true;
                 str = utf8::toUtf32(std::begin(data) + 3, std::end(data));
@@ -908,7 +908,7 @@ namespace json
         {
             std::vector<uint8_t> result;
 
-            if (bom) result = UTF8_BOM;
+            if (bom) result.assign(std::begin(UTF8_BOM), std::end(UTF8_BOM));
 
             encodeValue(result);
 
