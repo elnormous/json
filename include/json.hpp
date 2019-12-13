@@ -199,24 +199,8 @@ namespace json
         {
             Token token;
 
-            if (*iterator == '{' || *iterator == '}' ||
-                *iterator == '[' || *iterator == ']' ||
-                *iterator == ',' || *iterator == ':') // punctuation
-            {
-                switch (*iterator)
-                {
-                    case '{': token.type = Token::Type::LeftBrace; break;
-                    case '}': token.type = Token::Type::RightBrace; break;
-                    case '[': token.type = Token::Type::LeftBracket; break;
-                    case ']': token.type = Token::Type::RightBracket; break;
-                    case ',': token.type = Token::Type::Comma; break;
-                    case ':': token.type = Token::Type::Colon; break;
-                }
-
-                ++iterator;
-            }
-            else if (*iterator == '-' ||
-                     (*iterator >= '0' && *iterator <= '9'))
+            if (*iterator == '-' ||
+                (*iterator >= '0' && *iterator <= '9'))
             {
                 token.type = Token::Type::LiteralInteger;
 
@@ -367,7 +351,20 @@ namespace json
             else if (*iterator == '\0')
                 break;
             else
-                throw std::runtime_error("Unknown character");
+            {
+                switch (*iterator)
+                {
+                    case '{': token.type = Token::Type::LeftBrace; break;
+                    case '}': token.type = Token::Type::RightBrace; break;
+                    case '[': token.type = Token::Type::LeftBracket; break;
+                    case ']': token.type = Token::Type::RightBracket; break;
+                    case ',': token.type = Token::Type::Comma; break;
+                    case ':': token.type = Token::Type::Colon; break;
+                    default: throw std::runtime_error("Unknown character");
+                }
+
+                ++iterator;
+            }
 
             tokens.push_back(token);
         }
