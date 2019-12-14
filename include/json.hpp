@@ -162,6 +162,13 @@ namespace json
         }
     }
 
+    class ParseError final: public std::logic_error
+    {
+    public:
+        explicit ParseError(const std::string& str): std::logic_error(str) {}
+        explicit ParseError(const char* str): std::logic_error(str) {}
+    };
+
     struct Token final
     {
         enum class Type
@@ -209,7 +216,7 @@ namespace json
                     token.value.push_back(*iterator);
                     if (++iterator == str.cend() ||
                         *iterator < '0' || *iterator > '9')
-                        throw std::runtime_error("Invalid number");
+                        throw ParseError("Invalid number");
                 }
 
                 while (iterator != str.cend() &&
@@ -241,13 +248,13 @@ namespace json
                     token.value.push_back(*iterator);
 
                     if (++iterator == str.cend())
-                        throw std::runtime_error("Invalid exponent");
+                        throw ParseError("Invalid exponent");
 
                     if (*iterator == '+' || *iterator == '-')
                         token.value.push_back(*iterator);
 
                     if (++iterator == str.cend() || *iterator < '0' || *iterator > '9')
-                        throw std::runtime_error("Invalid exponent");
+                        throw ParseError("Invalid exponent");
 
                     while (iterator != str.cend() &&
                            (*iterator >= '0' && *iterator <= '9'))
@@ -264,7 +271,7 @@ namespace json
                 for (;;)
                 {
                     if (++iterator == str.cend())
-                        throw std::runtime_error("Unterminated string literal");
+                        throw ParseError("Unterminated string literal");
 
                     if (*iterator == '"')
                     {
@@ -274,7 +281,7 @@ namespace json
                     else if (*iterator == '\\')
                     {
                         if (++iterator == str.cend())
-                            throw std::runtime_error("Unterminated string literal");
+                            throw ParseError("Unterminated string literal");
 
                         switch (*iterator)
                         {
@@ -293,7 +300,7 @@ namespace json
                                 for (uint32_t i = 0; i < 4; ++i, ++iterator)
                                 {
                                     if (iterator == str.cend())
-                                        throw std::runtime_error("Unexpected end of data");
+                                        throw ParseError("Unexpected end of data");
 
                                     uint8_t code = 0;
 
@@ -301,7 +308,7 @@ namespace json
                                     else if (*iterator >= 'a' && *iterator <='f') code = static_cast<uint8_t>(*iterator) - 'a' + 10;
                                     else if (*iterator >= 'A' && *iterator <='F') code = static_cast<uint8_t>(*iterator) - 'A' + 10;
                                     else
-                                        throw std::runtime_error("Invalid character code");
+                                        throw ParseError("Invalid character code");
 
                                     c = (c << 4) | code;
                                 }
@@ -310,11 +317,11 @@ namespace json
                                 break;
                             }
                             default:
-                                throw std::runtime_error("Unrecognized escape character");
+                                throw ParseError("Unrecognized escape character");
                         }
                     }
                     else if (*iterator <= 0x1F) // control char
-                        throw std::runtime_error("Unterminated string literal");
+                        throw ParseError("Unterminated string literal");
                     else
                         token.value.push_back(*iterator);
                 }
@@ -338,7 +345,7 @@ namespace json
                 if (keywordIterator != keywordMap.end())
                     token.type = keywordIterator->second;
                 else
-                    throw std::runtime_error("Unknown keyword " + utf8::fromUtf32(token.value));
+                    throw ParseError("Unknown keyword " + utf8::fromUtf32(token.value));
             }
             else if (*iterator == ' ' ||
                      *iterator == '\t' ||
@@ -360,7 +367,7 @@ namespace json
                     case ']': token.type = Token::Type::RightBracket; break;
                     case ',': token.type = Token::Type::Comma; break;
                     case ':': token.type = Token::Type::Colon; break;
-                    default: throw std::runtime_error("Unknown character");
+                    default: throw ParseError("Unknown character");
                 }
 
                 ++iterator;
@@ -639,7 +646,7 @@ namespace json
                         TokenIterator end)
         {
             if (iterator == end)
-                throw std::runtime_error("Unexpected end of data");
+                throw ParseError("Unexpected end of data");
 
             if (iterator->type == Token::Type::LeftBrace)
                 return parseObject(iterator, end);
@@ -676,7 +683,7 @@ namespace json
                 ++iterator;
             }
             else
-                throw std::runtime_error("Expected a value");
+                throw ParseError("Expected a value");
         }
 
         template <class TokenIterator>
@@ -684,10 +691,10 @@ namespace json
                          TokenIterator end)
         {
             if (iterator == end)
-                throw std::runtime_error("Unexpected end of data");
+                throw ParseError("Unexpected end of data");
 
             if (iterator->type != Token::Type::LeftBrace)
-                throw std::runtime_error("Expected a left brace");
+                throw ParseError("Expected a left brace");
 
             ++iterator; // skip the left brace
 
@@ -696,7 +703,7 @@ namespace json
             for (;;)
             {
                 if (iterator == end)
-                    throw std::runtime_error("Unexpected end of data");
+                    throw ParseError("Unexpected end of data");
 
                 if (iterator->type == Token::Type::RightBrace)
                 {
@@ -709,28 +716,28 @@ namespace json
                 else
                 {
                     if (iterator->type != Token::Type::Comma)
-                        throw std::runtime_error("Expected a comma");
+                        throw ParseError("Expected a comma");
 
                     if (++iterator == end)
-                        throw std::runtime_error("Unexpected end of data");
+                        throw ParseError("Unexpected end of data");
                 }
 
                 if (iterator->type != Token::Type::LiteralString)
-                    throw std::runtime_error("Expected a string literal");
+                    throw ParseError("Expected a string literal");
 
                 std::string key = utf8::fromUtf32(iterator->value);
 
                 if (objectValue.find(key) != objectValue.end())
-                    throw std::runtime_error("Duplicate key value " + key);
+                    throw ParseError("Duplicate key value " + key);
 
                 if (++iterator == end)
-                    throw std::runtime_error("Unexpected end of data");
+                    throw ParseError("Unexpected end of data");
 
                 if (iterator->type != Token::Type::Colon)
-                    throw std::runtime_error("Expected a colon");
+                    throw ParseError("Expected a colon");
 
                 if (++iterator == end)
-                    throw std::runtime_error("Unexpected end of data");
+                    throw ParseError("Unexpected end of data");
 
                 Value value;
                 value.parseValue(iterator, end);
@@ -746,10 +753,10 @@ namespace json
                         TokenIterator end)
         {
             if (iterator == end)
-                throw std::runtime_error("Unexpected end of data");
+                throw ParseError("Unexpected end of data");
 
             if (iterator->type != Token::Type::LeftBracket)
-                throw std::runtime_error("Expected a left bracket");
+                throw ParseError("Expected a left bracket");
 
             ++iterator; // skip the left bracket
 
@@ -758,7 +765,7 @@ namespace json
             for (;;)
             {
                 if (iterator == end)
-                    throw std::runtime_error("Unexpected end of data");
+                    throw ParseError("Unexpected end of data");
 
                 if (iterator->type == Token::Type::RightBracket)
                 {
@@ -771,10 +778,10 @@ namespace json
                 else
                 {
                     if (iterator->type != Token::Type::Comma)
-                        throw std::runtime_error("Expected a comma");
+                        throw ParseError("Expected a comma");
 
                     if (++iterator == end)
-                        throw std::runtime_error("Unexpected end of data");
+                        throw ParseError("Unexpected end of data");
                 }
 
                 Value value;
@@ -854,7 +861,7 @@ namespace json
                     else data.insert(data.end(), {'f', 'a', 'l', 's', 'e'});
                     break;
                 default:
-                    throw std::runtime_error("Unknown value type");
+                    throw ParseError("Unknown value type");
             }
         }
 
