@@ -21,6 +21,20 @@ namespace json
         explicit ParseError(const char* str): std::logic_error(str) {}
     };
 
+    class TypeError final: public std::runtime_error
+    {
+    public:
+        explicit TypeError(const std::string& str): std::runtime_error(str) {}
+        explicit TypeError(const char* str): std::runtime_error(str) {}
+    };
+
+    class RangeError final: public std::runtime_error
+    {
+    public:
+        explicit RangeError(const std::string& str): std::runtime_error(str) {}
+        explicit RangeError(const char* str): std::runtime_error(str) {}
+    };
+
     inline namespace detail
     {
         namespace utf8
@@ -510,14 +524,14 @@ namespace json
         template <typename T, typename std::enable_if<std::is_same<T, std::string>::value>::type* = nullptr>
         const std::string& as() const
         {
-            if (type != Type::String) throw std::runtime_error("Wrong type");
+            if (type != Type::String) throw TypeError("Wrong type");
             return stringValue;
         }
 
         template <typename T, typename std::enable_if<std::is_same<T, const char*>::value>::type* = nullptr>
         const char* as() const
         {
-            if (type != Type::String) throw std::runtime_error("Wrong type");
+            if (type != Type::String) throw TypeError("Wrong type");
             return stringValue.c_str();
         }
 
@@ -525,7 +539,7 @@ namespace json
         T as() const
         {
             if (type != Type::Boolean && type != Type::Integer && type != Type::Float)
-                throw std::runtime_error("Wrong type");
+                throw TypeError("Wrong type");
             if (type == Type::Boolean) return boolValue;
             else if (type == Type::Integer) return intValue != 0;
             else return doubleValue != 0.0;
@@ -535,7 +549,7 @@ namespace json
         T as() const
         {
             if (type != Type::Boolean && type != Type::Integer && type != Type::Float)
-                throw std::runtime_error("Wrong type");
+                throw TypeError("Wrong type");
             if (type == Type::Boolean) return boolValue;
             else if (type == Type::Integer) return static_cast<T>(intValue);
             else return static_cast<T>(doubleValue);
@@ -551,7 +565,7 @@ namespace json
         template <typename T, typename std::enable_if<std::is_same<T, Object>::value>::type* = nullptr>
         inline const T& as() const
         {
-            if (type != Type::Object) throw std::runtime_error("Wrong type");
+            if (type != Type::Object) throw TypeError("Wrong type");
             return objectValue;
         }
 
@@ -565,31 +579,31 @@ namespace json
         template <typename T, typename std::enable_if<std::is_same<T, Array>::value>::type* = nullptr>
         inline const T& as() const
         {
-            if (type != Type::Array) throw std::runtime_error("Wrong type");
+            if (type != Type::Array) throw TypeError("Wrong type");
             return arrayValue;
         }
 
         Array::iterator begin()
         {
-            if (type != Type::Array) throw std::runtime_error("Wrong type");
+            if (type != Type::Array) throw TypeError("Wrong type");
             return arrayValue.begin();
         }
 
         Array::iterator end()
         {
-            if (type != Type::Array) throw std::runtime_error("Wrong type");
+            if (type != Type::Array) throw TypeError("Wrong type");
             return arrayValue.end();
         }
 
         Array::const_iterator begin() const
         {
-            if (type != Type::Array) throw std::runtime_error("Wrong type");
+            if (type != Type::Array) throw TypeError("Wrong type");
             return arrayValue.begin();
         }
 
         Array::const_iterator end() const
         {
-            if (type != Type::Array) throw std::runtime_error("Wrong type");
+            if (type != Type::Array) throw TypeError("Wrong type");
             return arrayValue.end();
         }
 
@@ -600,7 +614,7 @@ namespace json
 
         inline bool hasMember(const std::string& member) const
         {
-            if (type != Type::Object) throw std::runtime_error("Wrong type");
+            if (type != Type::Object) throw TypeError("Wrong type");
             return objectValue.find(member) != objectValue.end();
         }
 
@@ -612,13 +626,13 @@ namespace json
 
         inline const Value& operator[](const std::string& member) const
         {
-            if (type != Type::Object) throw std::runtime_error("Wrong type");
+            if (type != Type::Object) throw TypeError("Wrong type");
 
             auto i = objectValue.find(member);
             if (i != objectValue.end())
                 return i->second;
             else
-                throw std::runtime_error("Member does not exist");
+                throw RangeError("Member does not exist");
         }
 
         inline Value& operator[](size_t index)
@@ -630,17 +644,17 @@ namespace json
 
         inline const Value& operator[](size_t index) const
         {
-            if (type != Type::Array) throw std::runtime_error("Wrong type");
+            if (type != Type::Array) throw TypeError("Wrong type");
 
             if (index < arrayValue.size())
                 return arrayValue[index];
             else
-                throw std::runtime_error("Index out of range");
+                throw RangeError("Index out of range");
         }
 
         inline size_t getSize() const
         {
-            if (type != Type::Array) throw std::runtime_error("Wrong type");
+            if (type != Type::Array) throw TypeError("Wrong type");
             return arrayValue.size();
         }
 
