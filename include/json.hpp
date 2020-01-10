@@ -178,7 +178,7 @@ namespace json
                 }
                 else
                 {
-                    std::string encoded = utf8::fromUtf32(c);
+                    const std::string encoded = utf8::fromUtf32(c);
                     data.insert(data.end(), encoded.begin(), encoded.end());
                 }
             }
@@ -743,7 +743,7 @@ namespace json
                 if (iterator->type != Token::Type::LiteralString)
                     throw ParseError("Expected a string literal");
 
-                std::string key = utf8::fromUtf32(iterator->value);
+                const std::string key = utf8::fromUtf32(iterator->value);
 
                 if (objectValue.find(key) != objectValue.end())
                     throw ParseError("Duplicate key value " + key);
