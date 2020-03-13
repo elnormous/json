@@ -61,6 +61,10 @@ namespace
 
         if (d.as<float>() != 0.0F)
             throw TestError("Expected 0.0");
+
+        d = json::Data("0.1e1");
+        if (d.as<float>() != 1.0F)
+            throw TestError("Expected 1.0");
     }
 
     void testBoolean()

@@ -266,9 +266,9 @@ namespace json
                             throw ParseError("Invalid exponent");
 
                         if (*iterator == '+' || *iterator == '-')
-                            token.value.push_back(*iterator);
+                            token.value.push_back(*iterator++);
 
-                        if (++iterator == str.cend() || *iterator < '0' || *iterator > '9')
+                        if (iterator == str.cend() || *iterator < '0' || *iterator > '9')
                             throw ParseError("Invalid exponent");
 
                         while (iterator != str.cend() &&
