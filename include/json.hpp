@@ -46,32 +46,32 @@ namespace json
 
                 for (auto i = begin; i != end; ++i)
                 {
-                    std::uint32_t cp = *i & 0xFF;
+                    std::uint32_t cp = static_cast<std::uint32_t>(*i) & 0xFFU;
 
-                    if (cp <= 0x7F) // length = 1
+                    if (cp <= 0x7FU) // length = 1
                     {
                         // do nothing
                     }
-                    else if ((cp >> 5) == 0x6) // length = 2
+                    else if ((cp >> 5) == 0x6U) // length = 2
                     {
                         if (++i == end) return result;
-                        cp = ((cp << 6) & 0x7FF) + (*i & 0x3F);
+                        cp = ((cp << 6) & 0x7FFU) + (static_cast<std::uint32_t>(*i) & 0x3FU);
                     }
-                    else if ((cp >> 4) == 0xE) // length = 3
+                    else if ((cp >> 4) == 0xEU) // length = 3
                     {
                         if (++i == end) return result;
-                        cp = ((cp << 12) & 0xFFFF) + (((*i & 0xFF) << 6) & 0x0FFF);
+                        cp = ((cp << 12) & 0xFFFFU) + (((static_cast<std::uint32_t>(*i) & 0xFFU) << 6) & 0x0FFFU);
                         if (++i == end) return result;
-                        cp += *i & 0x3F;
+                        cp += static_cast<std::uint32_t>(*i) & 0x3FU;
                     }
-                    else if ((cp >> 3) == 0x1E) // length = 4
+                    else if ((cp >> 3) == 0x1EU) // length = 4
                     {
                         if (++i == end) return result;
-                        cp = ((cp << 18) & 0x1FFFFF) + (((*i & 0xFF) << 12) & 0x3FFFF);
+                        cp = ((cp << 18) & 0x1FFFFFU) + (((static_cast<std::uint32_t>(*i) & 0xFFU) << 12) & 0x3FFFFU);
                         if (++i == end) return result;
-                        cp += ((*i & 0xFF) << 6) & 0x0FFF;
+                        cp += ((static_cast<std::uint32_t>(*i) & 0xFFU) << 6) & 0x0FFFU;
                         if (++i == end) return result;
-                        cp += (*i) & 0x3F;
+                        cp += static_cast<std::uint32_t>(*i) & 0x3FU;
                     }
 
                     result.push_back(cp);
@@ -90,25 +90,25 @@ namespace json
             {
                 std::string result;
 
-                if (c <= 0x7F)
+                if (c <= 0x7FU)
                     result.push_back(static_cast<char>(c));
-                else if (c <= 0x7FF)
+                else if (c <= 0x7FFU)
                 {
-                    result.push_back(static_cast<char>(0xC0 | ((c >> 6) & 0x1F)));
-                    result.push_back(static_cast<char>(0x80 | (c & 0x3F)));
+                    result.push_back(static_cast<char>(0xC0U | ((c >> 6) & 0x1FU)));
+                    result.push_back(static_cast<char>(0x80U | (c & 0x3FU)));
                 }
-                else if (c <= 0xFFFF)
+                else if (c <= 0xFFFFU)
                 {
-                    result.push_back(static_cast<char>(0xE0 | ((c >> 12) & 0x0F)));
-                    result.push_back(static_cast<char>(0x80 | ((c >> 6) & 0x3F)));
-                    result.push_back(static_cast<char>(0x80 | (c & 0x3F)));
+                    result.push_back(static_cast<char>(0xE0U | ((c >> 12) & 0x0FU)));
+                    result.push_back(static_cast<char>(0x80U | ((c >> 6) & 0x3FU)));
+                    result.push_back(static_cast<char>(0x80U | (c & 0x3FU)));
                 }
                 else
                 {
-                    result.push_back(static_cast<char>(0xF0 | ((c >> 18) & 0x07)));
-                    result.push_back(static_cast<char>(0x80 | ((c >> 12) & 0x3F)));
-                    result.push_back(static_cast<char>(0x80 | ((c >> 6) & 0x3F)));
-                    result.push_back(static_cast<char>(0x80 | (c & 0x3F)));
+                    result.push_back(static_cast<char>(0xF0U | ((c >> 18) & 0x07U)));
+                    result.push_back(static_cast<char>(0x80U | ((c >> 12) & 0x3FU)));
+                    result.push_back(static_cast<char>(0x80U | ((c >> 6) & 0x3FU)));
+                    result.push_back(static_cast<char>(0x80U | (c & 0x3FU)));
                 }
 
                 return result;
@@ -121,25 +121,25 @@ namespace json
 
                 for (auto i = begin; i != end; ++i)
                 {
-                    if (*i <= 0x7F)
+                    if (*i <= 0x7FU)
                         result.push_back(static_cast<char>(*i));
-                    else if (*i <= 0x7FF)
+                    else if (*i <= 0x7FFU)
                     {
-                        result.push_back(static_cast<char>(0xC0 | ((*i >> 6) & 0x1F)));
-                        result.push_back(static_cast<char>(0x80 | (*i & 0x3F)));
+                        result.push_back(static_cast<char>(0xC0U | ((*i >> 6) & 0x1FU)));
+                        result.push_back(static_cast<char>(0x80U | (*i & 0x3FU)));
                     }
-                    else if (*i <= 0xFFFF)
+                    else if (*i <= 0xFFFFU)
                     {
-                        result.push_back(static_cast<char>(0xE0 | ((*i >> 12) & 0x0F)));
-                        result.push_back(static_cast<char>(0x80 | ((*i >> 6) & 0x3F)));
-                        result.push_back(static_cast<char>(0x80 | (*i & 0x3F)));
+                        result.push_back(static_cast<char>(0xE0U | ((*i >> 12) & 0x0FU)));
+                        result.push_back(static_cast<char>(0x80U | ((*i >> 6) & 0x3FU)));
+                        result.push_back(static_cast<char>(0x80U | (*i & 0x3FU)));
                     }
                     else
                     {
-                        result.push_back(static_cast<char>(0xF0 | ((*i >> 18) & 0x07)));
-                        result.push_back(static_cast<char>(0x80 | ((*i >> 12) & 0x3F)));
-                        result.push_back(static_cast<char>(0x80 | ((*i >> 6) & 0x3F)));
-                        result.push_back(static_cast<char>(0x80 | (*i & 0x3F)));
+                        result.push_back(static_cast<char>(0xF0U | ((*i >> 18) & 0x07U)));
+                        result.push_back(static_cast<char>(0x80U | ((*i >> 12) & 0x3FU)));
+                        result.push_back(static_cast<char>(0x80U | ((*i >> 6) & 0x3FU)));
+                        result.push_back(static_cast<char>(0x80U | (*i & 0x3FU)));
                     }
                 }
 
@@ -168,13 +168,13 @@ namespace json
                 else if (c == '\n') data.insert(data.end(), {'\\', 'n'});
                 else if (c == '\r') data.insert(data.end(), {'\\', 'r'});
                 else if (c == '\t') data.insert(data.end(), {'\\', 't'});
-                else if (c <= 0x1F)
+                else if (c <= 0x1FU)
                 {
                     data.insert(data.end(), {'\\', 'u'});
 
                     constexpr char digits[] = "0123456789abcdef";
                     for (std::uint32_t p = 0; p < 4; ++p)
-                        data.push_back(static_cast<std::uint8_t>(digits[(c >> (12 - p * 4)) & 0x0F]));
+                        data.push_back(static_cast<std::uint8_t>(digits[(c >> (12 - p * 4)) & 0x0FU]));
                 }
                 else
                 {
@@ -334,7 +334,7 @@ namespace json
                                     throw ParseError("Unrecognized escape character");
                             }
                         }
-                        else if (*iterator <= 0x1F) // control char
+                        else if (*iterator <= 0x1FU) // control char
                             throw ParseError("Unterminated string literal");
                         else
                             token.value.push_back(*iterator);
