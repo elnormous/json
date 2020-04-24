@@ -130,6 +130,16 @@ namespace
         if (d[0].as<int>() != 1 || d[1].as<int>() != 2)
             throw TestError("Expected elements 1 and 2");
     }
+
+    void testUnicode()
+    {
+        json::Data d = json::Data("\"ē–\"");
+        if (d.getType() != json::Value::Type::String)
+            throw TestError("Expected an array");
+
+        if (d.as<std::string>() != "ē–")
+            throw TestError("Wrong value");
+    }
 }
 
 int main()
@@ -144,6 +154,7 @@ int main()
     testRunner.run(testObject);
     testRunner.run(testEmptyArray);
     testRunner.run(testArray);
+    testRunner.run(testUnicode);
 
     if (testRunner.getResult())
         std::cout << "Success\n";
