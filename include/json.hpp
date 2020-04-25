@@ -57,7 +57,7 @@ namespace json
         Value(const Type initType): type(initType) {}
 
         template <typename T, typename std::enable_if<std::is_floating_point<T>::value>::type* = nullptr>
-        Value(const T value): type(Type::Float), doubleValue(isfinite(value) ? static_cast<double>(value) : 0.0) {}
+        Value(const T value): type(Type::Float), doubleValue(std::isfinite(value) ? static_cast<double>(value) : 0.0) {}
 
         template <typename T, typename std::enable_if<std::is_integral<T>::value && !std::is_same<T, bool>::value>::type* = nullptr>
         Value(const T value): type(Type::Integer), intValue(static_cast<std::int64_t>(value)) {}
@@ -84,7 +84,7 @@ namespace json
         inline Value& operator=(const T value) noexcept
         {
             type = Type::Float;
-            doubleValue = isfinite(value) ? static_cast<double>(value) : 0.0;
+            doubleValue = std::isfinite(value) ? static_cast<double>(value) : 0.0;
             return *this;
         }
 
