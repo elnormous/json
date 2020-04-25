@@ -21,6 +21,9 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\json.hpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{614C7EC0-3262-40DF-B884-224B959A01F9}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
