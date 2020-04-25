@@ -38,14 +38,14 @@ namespace
 
     void testNull()
     {
-        json::Data d("null");
+        json::Value d = json::parse("null");
         if (!d.isNull())
             throw TestError("Expected a null");
     }
 
     void testInteger()
     {
-        json::Data d("0");
+        json::Value d = json::parse("0");
         if (d.getType() != json::Value::Type::Integer)
             throw TestError("Expected an integer");
 
@@ -55,21 +55,21 @@ namespace
 
     void testFloat()
     {
-        json::Data d("0.0");
+        json::Value d = json::parse("0.0");
         if (d.getType() != json::Value::Type::Float)
             throw TestError("Expected a float");
 
         if (d.as<float>() != 0.0F)
             throw TestError("Expected 0.0");
 
-        d = json::Data("0.1e1");
+        d = json::parse("0.1e1");
         if (d.as<float>() != 1.0F)
             throw TestError("Expected 1.0");
     }
 
     void testBoolean()
     {
-        json::Data d("false");
+        json::Value d = json::parse("false");
         if (d.getType() != json::Value::Type::Boolean)
             throw TestError("Expected a boolean");
 
@@ -79,22 +79,22 @@ namespace
 
     void testString()
     {
-        json::Data d("\"\"");
+        json::Value d = json::parse("\"\"");
         if (d.getType() != json::Value::Type::String)
             throw TestError("Expected a string");
     }
 
     void testEmptyObject()
     {
-        json::Data d("{}");
+        json::Value d = json::parse("{}");
         if (d.getType() != json::Value::Type::Object)
             throw TestError("Expected an object");
     }
 
     void testObject()
     {
-        json::Data d;
-        d = json::Data("{\"a\":\"b\"}");
+        json::Value d;
+        d = json::parse("{\"a\":\"b\"}");
         if (d.getType() != json::Value::Type::Object)
             throw TestError("Expected an object");
 
@@ -110,7 +110,7 @@ namespace
 
     void testEmptyArray()
     {
-        json::Data d("[]");
+        json::Value d = json::parse("[]");
         if (d.getType() != json::Value::Type::Array)
             throw TestError("Expected an array");
 
@@ -120,7 +120,7 @@ namespace
 
     void testArray()
     {
-        json::Data d = json::Data("[1, 2]");
+        json::Value d = json::parse("[1, 2]");
         if (d.getType() != json::Value::Type::Array)
             throw TestError("Expected an array");
 
@@ -133,12 +133,26 @@ namespace
 
     void testUnicode()
     {
-        json::Data d = json::Data("\"ē–\"");
+        json::Value d = json::parse("\"ē–\"");
         if (d.getType() != json::Value::Type::String)
             throw TestError("Expected an array");
 
         if (d.as<std::string>() != "ē–")
             throw TestError("Wrong value");
+    }
+
+    void testEncoding()
+    {
+        json::Value d = json::Value::Object {
+            {"i", 1},
+            {"f", 2.0F},
+            {"s", "foo"},
+            {"b", true},
+            {"a", json::Value::Array{true, 1, 2.0F, "3"}}
+        };
+
+        if (json::encode(d) != "{\"a\":[true,1,2.000000,\"3\"],\"b\":true,\"f\":2.000000,\"i\":1,\"s\":\"foo\"}")
+            throw TestError("Wrong encoded result");
     }
 }
 
@@ -155,6 +169,7 @@ int main()
     testRunner.run(testEmptyArray);
     testRunner.run(testArray);
     testRunner.run(testUnicode);
+    testRunner.run(testEncoding);
 
     if (testRunner.getResult())
         std::cout << "Success\n";
