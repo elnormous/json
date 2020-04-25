@@ -143,7 +143,8 @@ namespace
 
     void testEncoding()
     {
-        json::Value d = json::Value::Object {
+        json::Value d = json::Value::Object{
+            {"n", nullptr},
             {"i", 1},
             {"f", 2.0F},
             {"s", "foo"},
@@ -151,7 +152,7 @@ namespace
             {"a", json::Value::Array{true, 1, 2.0F, "3"}}
         };
 
-        if (json::encode(d) != "{\"a\":[true,1,2.000000,\"3\"],\"b\":true,\"f\":2.000000,\"i\":1,\"s\":\"foo\"}")
+        if (json::encode(d) != "{\"a\":[true,1,2.000000,\"3\"],\"b\":true,\"f\":2.000000,\"i\":1,\"n\":null,\"s\":\"foo\"}")
             throw TestError("Wrong encoded result");
     }
 }
