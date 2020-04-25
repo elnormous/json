@@ -35,11 +35,6 @@ namespace json
         explicit RangeError(const char* str): std::runtime_error(str) {}
     };
 
-    inline namespace detail
-    {
-        constexpr std::uint8_t UTF8_BOM[] = {0xEF, 0xBB, 0xBF};
-    }
-
     class Value
     {
     public:
@@ -314,6 +309,11 @@ namespace json
         std::string stringValue;
     };
 
+    inline namespace detail
+    {
+        constexpr std::uint8_t utf8ByteOrderMark[] = {0xEF, 0xBB, 0xBF};
+    }
+
     template <class Iterator>
     Value parse(Iterator begin, Iterator end)
     {
@@ -324,7 +324,7 @@ namespace json
             {
                 bool byteOrderMark = std::distance(begin, end) >= 3 &&
                     std::equal(begin, begin + 3,
-                               std::begin(UTF8_BOM));
+                               std::begin(utf8ByteOrderMark));
 
                 const std::vector<Token> tokens = tokenize(byteOrderMark ? begin + 3 : begin, end);
                 auto iterator = tokens.begin();
@@ -711,7 +711,8 @@ namespace json
             static std::string encode(const Value& value, bool byteOrderMark)
             {
                 std::string result;
-                if (byteOrderMark) result.assign(std::begin(UTF8_BOM), std::end(UTF8_BOM));
+                if (byteOrderMark) result.assign(std::begin(utf8ByteOrderMark),
+                                                 std::end(utf8ByteOrderMark));
                 encode(value, result);
                 return result;
             }
