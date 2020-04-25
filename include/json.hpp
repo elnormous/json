@@ -322,11 +322,7 @@ namespace json
         public:
             static Value parse(Iterator begin, Iterator end)
             {
-                bool byteOrderMark = std::distance(begin, end) >= 3 &&
-                    std::equal(begin, begin + 3,
-                               std::begin(utf8ByteOrderMark));
-
-                const std::vector<Token> tokens = tokenize(byteOrderMark ? begin + 3 : begin, end);
+                const std::vector<Token> tokens = tokenize(hasByteOrderMark(begin, end) ? begin + 3 : begin, end);
                 auto iterator = tokens.begin();
                 Value result;
                 parse(iterator, tokens.end(), result);
@@ -334,6 +330,14 @@ namespace json
             }
 
         private:
+            static bool hasByteOrderMark(Iterator begin, Iterator end) noexcept
+            {
+                for (auto i = std::begin(utf8ByteOrderMark); i != std::end(utf8ByteOrderMark); ++i, ++begin)
+                    if (begin == end || *begin != *i)
+                        return false;
+                return true;
+            }
+
             struct Token final
             {
                 enum class Type
@@ -721,7 +725,6 @@ namespace json
             static void encode(const std::string& str, std::string& result)
             {
                 for (const auto c : str)
-                {
                     if (c == '"') result.insert(result.end(), {'\\', '"'});
                     else if (c == '\\') result.insert(result.end(), {'\\', '\\'});
                     else if (c == '/') result.insert(result.end(), {'\\', '/'});
@@ -740,7 +743,6 @@ namespace json
                     }
                     else
                         result.push_back(c);
-                }
             }
 
             static void encode(const Value& value, std::string& result)
