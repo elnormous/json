@@ -27,7 +27,7 @@ namespace
             }
         }
 
-        inline bool getResult() const noexcept { return result; }
+        bool getResult() const noexcept { return result; }
 
     private:
         bool result = true;
