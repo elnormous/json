@@ -324,9 +324,7 @@ namespace json
             {
                 const std::vector<Token> tokens = tokenize(hasByteOrderMark(begin, end) ? begin + 3 : begin, end);
                 auto iterator = tokens.begin();
-                Value result;
-                parse(iterator, tokens.end(), result);
-                return result;
+                return parse(iterator, tokens.end());
             }
 
         private:
@@ -566,12 +564,13 @@ namespace json
                 return tokens;
             }
 
-            static void parse(typename std::vector<Token>::const_iterator& iterator,
-                              typename std::vector<Token>::const_iterator end,
-                              Value& result)
+            static Value parse(typename std::vector<Token>::const_iterator& iterator,
+                               typename std::vector<Token>::const_iterator end)
             {
                 if (iterator == end)
                     throw ParseError("Unexpected end of data");
+
+                Value result;
 
                 if (iterator->type == Token::Type::LeftBrace)
                 {
@@ -620,9 +619,7 @@ namespace json
                         if (++iterator == end)
                             throw ParseError("Unexpected end of data");
 
-                        Value value;
-                        parse(iterator, end, value);
-                        result[key] = value;
+                        result[key] = parse(iterator, end);
                     }
                 }
                 else if (iterator->type == Token::Type::LeftBracket)
@@ -655,9 +652,7 @@ namespace json
                                 throw ParseError("Unexpected end of data");
                         }
 
-                        Value value;
-                        parse(iterator, end, value);
-                        result.pushBack(value);
+                        result.pushBack(parse(iterator, end));
                     }
                 }
                 else if (iterator->type == Token::Type::LiteralInteger)
@@ -688,6 +683,8 @@ namespace json
                 }
                 else
                     throw ParseError("Expected a value");
+
+                return result;
             }
         };
 
