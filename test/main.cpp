@@ -146,10 +146,16 @@ namespace
             {"f", 2.0F},
             {"s", "foo"},
             {"b", true},
-            {"a", json::Value::Array{true, 1, 2.0F, "3"}}
+            {"a", json::Value::Array{
+                true, 1, 2.0F, "3",
+                json::Value::Array{1, 2, 3}}
+            }
         };
 
-        if (json::encode(d) != "{\"a\":[true,1,2.000000,\"3\"],\"b\":true,\"f\":2.000000,\"i\":1,\"n\":null,\"s\":\"foo\"}")
+        if (json::encode(d) != "{\"a\":[true,1,2.000000,\"3\",[1,2,3]],\"b\":true,\"f\":2.000000,\"i\":1,\"n\":null,\"s\":\"foo\"}")
+            throw TestError("Wrong encoded result");
+
+        if (json::encode(d, true) != "{\n\t\"a\":[\n\t\ttrue,\n\t\t1,\n\t\t2.000000,\n\t\t\"3\",\n\t\t[\n\t\t\t1,\n\t\t\t2,\n\t\t\t3\n\t\t]\n\t],\n\t\"b\":true,\n\t\"f\":2.000000,\n\t\"i\":1,\n\t\"n\":null,\n\t\"s\":\"foo\"\n}")
             throw TestError("Wrong encoded result");
     }
 }

@@ -707,17 +707,17 @@ namespace json
         return parse(std::begin(data), std::end(data));
     }
 
-    inline std::string encode(const Value& value, bool byteOrderMark = false)
+    inline std::string encode(const Value& value, bool whitespaces = false, bool byteOrderMark = false)
     {
         class Encoder final
         {
         public:
-            static std::string encode(const Value& value, bool byteOrderMark)
+            static std::string encode(const Value& value, bool whitespaces, bool byteOrderMark)
             {
                 std::string result;
                 if (byteOrderMark) result.assign(std::begin(utf8ByteOrderMark),
                                                  std::end(utf8ByteOrderMark));
-                encode(value, result);
+                encode(value, result, whitespaces);
                 return result;
             }
 
@@ -745,7 +745,7 @@ namespace json
                         result.push_back(c);
             }
 
-            static void encode(const Value& value, std::string& result)
+            static void encode(const Value& value, std::string& result, bool whitespaces, size_t level = 0)
             {
                 switch (value.getType())
                 {
@@ -774,37 +774,43 @@ namespace json
                     case Value::Type::Object:
                     {
                         result.push_back('{');
+                        if (whitespaces) result.push_back('\n');
 
-                        bool first = true;
+                        const auto& entries = value.as<Value::Object>();
 
-                        for (const auto& entry : value.as<Value::Object>())
+                        for (auto entryIterator = entries.begin(); entryIterator != entries.end();)
                         {
-                            if (first) first = false;
-                            else result.push_back(',');
-
+                            const auto& entry = *entryIterator;
+                            if (whitespaces) result.insert(result.end(), level + 1, '\t');
                             result.push_back('"');
                             encode(entry.first, result);
                             result.insert(result.end(), {'"', ':'});
-                            encode(entry.second, result);
+                            encode(entry.second, result, whitespaces, level + 1);
+                            if (++entryIterator != entries.end()) result.push_back(',');
+                            if (whitespaces) result.push_back('\n');
                         }
 
+                        if (whitespaces) result.insert(result.end(), level, '\t');
                         result.push_back('}');
                         break;
                     }
                     case Value::Type::Array:
                     {
                         result.push_back('[');
+                        if (whitespaces) result.push_back('\n');
 
-                        bool first = true;
+                        const auto& entries = value.as<Value::Array>();
 
-                        for (const auto& entry : value)
+                        for (auto entryIterator = entries.begin(); entryIterator != entries.end();)
                         {
-                            if (first) first = false;
-                            else result.push_back(',');
-
-                            encode(entry, result);
+                            const auto& entry = *entryIterator;
+                            if (whitespaces) result.insert(result.end(), level + 1, '\t');
+                            encode(entry, result, whitespaces, level + 1);
+                            if (++entryIterator != entries.end()) result.push_back(',');
+                            if (whitespaces) result.push_back('\n');
                         }
 
+                        if (whitespaces) result.insert(result.end(), level, '\t');
                         result.push_back(']');
                         break;
                     }
@@ -818,7 +824,7 @@ namespace json
             }
         };
 
-        return Encoder::encode(value, byteOrderMark);
+        return Encoder::encode(value, whitespaces, byteOrderMark);
     }
 } // namespace json
 
