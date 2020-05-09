@@ -43,7 +43,7 @@ namespace
     void testInteger()
     {
         json::Value d = json::parse("0");
-        if (d.getType() != json::Value::Type::Integer)
+        if (d.getType() != json::Value::Type::integer)
             throw TestError("Expected an integer");
 
         if (d.as<int>() != 0)
@@ -53,7 +53,7 @@ namespace
     void testFloat()
     {
         json::Value d = json::parse("0.0");
-        if (d.getType() != json::Value::Type::Float)
+        if (d.getType() != json::Value::Type::floatingPoint)
             throw TestError("Expected a float");
 
         if (d.as<float>() != 0.0F)
@@ -67,7 +67,7 @@ namespace
     void testBoolean()
     {
         json::Value d = json::parse("false");
-        if (d.getType() != json::Value::Type::Boolean)
+        if (d.getType() != json::Value::Type::boolean)
             throw TestError("Expected a boolean");
 
         if (d.as<bool>() != false)
@@ -77,14 +77,14 @@ namespace
     void testString()
     {
         json::Value d = json::parse("\"\"");
-        if (d.getType() != json::Value::Type::String)
+        if (d.getType() != json::Value::Type::string)
             throw TestError("Expected a string");
     }
 
     void testEmptyObject()
     {
         json::Value d = json::parse("{}");
-        if (d.getType() != json::Value::Type::Object)
+        if (d.getType() != json::Value::Type::object)
             throw TestError("Expected an object");
     }
 
@@ -92,13 +92,13 @@ namespace
     {
         json::Value d;
         d = json::parse("{\"a\":\"b\"}");
-        if (d.getType() != json::Value::Type::Object)
+        if (d.getType() != json::Value::Type::object)
             throw TestError("Expected an object");
 
         if (!d.hasMember("a"))
             throw TestError("Expected a member \"a\"");
 
-        if (d["a"].getType() != json::Value::Type::String)
+        if (d["a"].getType() != json::Value::Type::string)
             throw TestError("Expected a string member");
 
         if (d["a"].as<std::string>() != "b")
@@ -108,7 +108,7 @@ namespace
     void testEmptyArray()
     {
         json::Value d = json::parse("[]");
-        if (d.getType() != json::Value::Type::Array)
+        if (d.getType() != json::Value::Type::array)
             throw TestError("Expected an array");
 
         if (!d.as<json::Value::Array>().empty())
@@ -118,7 +118,7 @@ namespace
     void testArray()
     {
         json::Value d = json::parse("[1, 2]");
-        if (d.getType() != json::Value::Type::Array)
+        if (d.getType() != json::Value::Type::array)
             throw TestError("Expected an array");
 
         if (d.as<json::Value::Array>().size() != 2)
@@ -131,7 +131,7 @@ namespace
     void testUnicode()
     {
         json::Value d = json::parse("\"ē–\"");
-        if (d.getType() != json::Value::Type::String)
+        if (d.getType() != json::Value::Type::string)
             throw TestError("Expected an array");
 
         if (d.as<std::string>() != "ē–")
