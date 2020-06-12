@@ -372,27 +372,31 @@ namespace json
                 {
                     Token token;
 
-                    if (*iterator == '-' ||
-                        (*iterator >= '0' && *iterator <= '9'))
+                    if (static_cast<char>(*iterator) == '-' ||
+                        (static_cast<char>(*iterator) >= '0' &&
+                         static_cast<char>(*iterator) <= '9'))
                     {
                         token.type = Token::Type::literalInteger;
 
-                        if (*iterator == '-')
+                        if (static_cast<char>(*iterator) == '-')
                         {
                             token.value.push_back(static_cast<char>(*iterator));
                             if (++iterator == end ||
-                                *iterator < '0' || *iterator > '9')
+                                static_cast<char>(*iterator) < '0' ||
+                                static_cast<char>(*iterator) > '9')
                                 throw ParseError("Invalid number");
                         }
 
                         while (iterator != end &&
-                               (*iterator >= '0' && *iterator <= '9'))
+                               (static_cast<char>(*iterator) >= '0' &&
+                                static_cast<char>(*iterator) <= '9'))
                         {
                             token.value.push_back(static_cast<char>(*iterator));
                             ++iterator;
                         }
 
-                        if (iterator != end && *iterator == '.')
+                        if (iterator != end &&
+                            static_cast<char>(*iterator) == '.')
                         {
                             token.type = Token::Type::literalFloat;
 
@@ -400,7 +404,8 @@ namespace json
                             ++iterator;
 
                             while (iterator != end &&
-                                   (*iterator >= '0' && *iterator <= '9'))
+                                   (static_cast<char>(*iterator) >= '0' &&
+                                    static_cast<char>(*iterator) <= '9'))
                             {
                                 token.value.push_back(static_cast<char>(*iterator));
                                 ++iterator;
@@ -409,27 +414,33 @@ namespace json
 
                         // parse exponent
                         if (iterator != end &&
-                            (*iterator == 'e' || *iterator == 'E'))
+                            (static_cast<char>(*iterator) == 'e' ||
+                             static_cast<char>(*iterator) == 'E'))
                         {
                             token.value.push_back(static_cast<char>(*iterator));
 
                             if (++iterator == end)
                                 throw ParseError("Invalid exponent");
 
-                            if (*iterator == '+' || *iterator == '-')
+                            if (static_cast<char>(*iterator) == '+' ||
+                                static_cast<char>(*iterator) == '-')
                                 token.value.push_back(static_cast<char>(*iterator++));
 
-                            if (iterator == end || *iterator < '0' || *iterator > '9')
+                            if (iterator == end ||
+                                static_cast<char>(*iterator) < '0' ||
+                                static_cast<char>(*iterator) > '9')
                                 throw ParseError("Invalid exponent");
 
-                            while (iterator != end && *iterator >= '0' && *iterator <= '9')
+                            while (iterator != end &&
+                                   static_cast<char>(*iterator) >= '0' &&
+                                   static_cast<char>(*iterator) <= '9')
                             {
                                 token.value.push_back(static_cast<char>(*iterator));
                                 ++iterator;
                             }
                         }
                     }
-                    else if (*iterator == '"') // string literal
+                    else if (static_cast<char>(*iterator) == '"') // string literal
                     {
                         token.type = Token::Type::literalString;
 
@@ -438,17 +449,17 @@ namespace json
                             if (++iterator == end)
                                 throw ParseError("Unterminated string literal");
 
-                            if (*iterator == '"')
+                            if (static_cast<char>(*iterator) == '"')
                             {
                                 ++iterator;
                                 break;
                             }
-                            else if (*iterator == '\\')
+                            else if (static_cast<char>(*iterator) == '\\')
                             {
                                 if (++iterator == end)
                                     throw ParseError("Unterminated string literal");
 
-                                switch (*iterator)
+                                switch (static_cast<char>(*iterator))
                                 {
                                     case '"': token.value.push_back('"'); break;
                                     case '\\': token.value.push_back('\\'); break;
@@ -469,9 +480,12 @@ namespace json
 
                                             std::uint8_t code = 0;
 
-                                            if (*iterator >= '0' && *iterator <= '9') code = static_cast<std::uint8_t>(*iterator) - '0';
-                                            else if (*iterator >= 'a' && *iterator <='f') code = static_cast<std::uint8_t>(*iterator) - 'a' + 10;
-                                            else if (*iterator >= 'A' && *iterator <='F') code = static_cast<std::uint8_t>(*iterator) - 'A' + 10;
+                                            if (static_cast<char>(*iterator) >= '0' && static_cast<char>(*iterator) <= '9')
+                                                code = static_cast<std::uint8_t>(*iterator) - '0';
+                                            else if (static_cast<char>(*iterator) >= 'a' && static_cast<char>(*iterator) <='f')
+                                                code = static_cast<std::uint8_t>(*iterator) - 'a' + 10;
+                                            else if (static_cast<char>(*iterator) >= 'A' && static_cast<char>(*iterator) <='F')
+                                                code = static_cast<std::uint8_t>(*iterator) - 'A' + 10;
                                             else
                                                 throw ParseError("Invalid character code");
 
@@ -505,21 +519,22 @@ namespace json
                                         throw ParseError("Unrecognized escape character");
                                 }
                             }
-                            else if (*iterator >= 0 && *iterator <= 0x1F) // control char
+                            else if (static_cast<char>(*iterator) >= 0 &&
+                                     static_cast<uint8_t>(*iterator) <= 0x1F) // control char
                                 throw ParseError("Unterminated string literal");
                             else
                                 token.value.push_back(static_cast<char>(*iterator));
                         }
                     }
-                    else if ((*iterator >= 'a' && *iterator <= 'z') ||
-                             (*iterator >= 'A' && *iterator <= 'Z') ||
-                             *iterator == '_')
+                    else if ((static_cast<char>(*iterator) >= 'a' && static_cast<char>(*iterator) <= 'z') ||
+                             (static_cast<char>(*iterator) >= 'A' && static_cast<char>(*iterator) <= 'Z') ||
+                             static_cast<char>(*iterator) == '_')
                     {
                         while (iterator != end &&
-                               ((*iterator >= 'a' && *iterator <= 'z') ||
-                                (*iterator >= 'A' && *iterator <= 'Z') ||
-                                *iterator == '_' ||
-                                (*iterator >= '0' && *iterator <= '9')))
+                               ((static_cast<char>(*iterator) >= 'a' && static_cast<char>(*iterator) <= 'z') ||
+                                (static_cast<char>(*iterator) >= 'A' && static_cast<char>(*iterator) <= 'Z') ||
+                                static_cast<char>(*iterator) == '_' ||
+                                (static_cast<char>(*iterator) >= '0' && static_cast<char>(*iterator) <= '9')))
                         {
                             token.value.push_back(static_cast<char>(*iterator));
                             ++iterator;
@@ -532,19 +547,19 @@ namespace json
                         else
                             throw ParseError("Unknown keyword " + token.value);
                     }
-                    else if (*iterator == ' ' ||
-                             *iterator == '\t' ||
-                             *iterator == '\r' ||
-                             *iterator == '\n') // whitespace or newline
+                    else if (static_cast<char>(*iterator) == ' ' ||
+                             static_cast<char>(*iterator) == '\t' ||
+                             static_cast<char>(*iterator) == '\r' ||
+                             static_cast<char>(*iterator) == '\n') // whitespace or newline
                     {
                         ++iterator;
                         continue;
                     }
-                    else if (*iterator == '\0')
+                    else if (static_cast<char>(*iterator) == '\0')
                         break;
                     else
                     {
-                        switch (*iterator)
+                        switch (static_cast<char>(*iterator))
                         {
                             case '{': token.type = Token::Type::leftBrace; break;
                             case '}': token.type = Token::Type::rightBrace; break;

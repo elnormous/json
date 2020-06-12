@@ -158,6 +158,20 @@ namespace
         if (json::encode(d, true) != "{\n\t\"a\":[\n\t\ttrue,\n\t\t1,\n\t\t2.000000,\n\t\t\"3\",\n\t\t[\n\t\t\t1,\n\t\t\t2,\n\t\t\t3\n\t\t]\n\t],\n\t\"b\":true,\n\t\"f\":2.000000,\n\t\"i\":1,\n\t\"n\":null,\n\t\"s\":\"foo\"\n}")
             throw TestError("Wrong encoded result");
     }
+
+    enum class byte: unsigned char {};
+
+    void testByte()
+    {
+        std::vector<byte> data = {
+            static_cast<byte>('{'),
+            static_cast<byte>('}')
+        };
+
+        json::Value d = json::parse(data);
+        if (d.getType() != json::Value::Type::object)
+            throw TestError("Expected an object");
+    }
 }
 
 int main()
@@ -174,6 +188,7 @@ int main()
     testRunner.run(testArray);
     testRunner.run(testUnicode);
     testRunner.run(testEncoding);
+    testRunner.run(testByte);
 
     if (testRunner.getResult())
         std::cout << "Success\n";
