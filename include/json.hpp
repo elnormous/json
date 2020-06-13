@@ -519,8 +519,7 @@ namespace json
                                         throw ParseError("Unrecognized escape character");
                                 }
                             }
-                            else if (static_cast<char>(*iterator) >= 0 &&
-                                     static_cast<uint8_t>(*iterator) <= 0x1F) // control char
+                            else if (static_cast<std::uint8_t>(*iterator) <= 0x1F) // control char
                                 throw ParseError("Unterminated string literal");
                             else
                                 token.value.push_back(static_cast<char>(*iterator));
