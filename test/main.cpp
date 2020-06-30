@@ -14,15 +14,16 @@ namespace
     {
     public:
         template <class T, class ...Args>
-        void run(T test, Args ...args) noexcept
+        void run(const std::string& name, T test, Args ...args) noexcept
         {
             try
             {
                 test(args...);
+                std::cerr << name << " succeeded\n";
             }
             catch (const TestError& e)
             {
-                std::cerr << e.what() << '\n';
+                std::cerr << name << " failed: " << e.what() << '\n';
                 result = false;
             }
         }
@@ -177,18 +178,18 @@ namespace
 int main()
 {
     TestRunner testRunner;
-    testRunner.run(testNull);
-    testRunner.run(testInteger);
-    testRunner.run(testFloat);
-    testRunner.run(testBoolean);
-    testRunner.run(testString);
-    testRunner.run(testEmptyObject);
-    testRunner.run(testObject);
-    testRunner.run(testEmptyArray);
-    testRunner.run(testArray);
-    testRunner.run(testUnicode);
-    testRunner.run(testEncoding);
-    testRunner.run(testByte);
+    testRunner.run("testNull", testNull);
+    testRunner.run("testInteger", testInteger);
+    testRunner.run("testFloat", testFloat);
+    testRunner.run("testBoolean", testBoolean);
+    testRunner.run("testString", testString);
+    testRunner.run("testEmptyObject", testEmptyObject);
+    testRunner.run("testObject", testObject);
+    testRunner.run("testEmptyArray", testEmptyArray);
+    testRunner.run("testArray", testArray);
+    testRunner.run("testUnicode", testUnicode);
+    testRunner.run("testEncoding", testEncoding);
+    testRunner.run("testByte", testByte);
 
     if (testRunner.getResult())
         std::cout << "Success\n";
