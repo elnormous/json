@@ -1,3 +1,4 @@
+#include <chrono>
 #include <iostream>
 #include "json.hpp"
 
@@ -13,13 +14,27 @@ namespace
     class TestRunner final
     {
     public:
+        TestRunner() noexcept = default;
+        TestRunner(const TestRunner&) = delete;
+        TestRunner& operator=(const TestRunner&) = delete;
+        ~TestRunner()
+        {
+            if (result)
+                std::cout << "Success, total duration: " << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() << "ms\n";
+        }
+
         template <class T, class ...Args>
         void run(const std::string& name, T test, Args ...args) noexcept
         {
             try
             {
+                std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
                 test(args...);
-                std::cerr << name << " succeeded\n";
+                std::chrono::steady_clock::time_point finish = std::chrono::steady_clock::now();
+
+                duration += finish - start;
+
+                std::cerr << name << " succeeded, duration: " << std::chrono::duration_cast<std::chrono::milliseconds>(finish - start).count() << "ms\n";
             }
             catch (const TestError& e)
             {
@@ -29,9 +44,11 @@ namespace
         }
 
         bool getResult() const noexcept { return result; }
+        std::chrono::steady_clock::duration getDuration() const noexcept { return duration; }
 
     private:
         bool result = true;
+        std::chrono::steady_clock::duration duration = std::chrono::milliseconds(0);
     };
 
     void testNull()
@@ -190,9 +207,6 @@ int main()
     testRunner.run("testUnicode", testUnicode);
     testRunner.run("testEncoding", testEncoding);
     testRunner.run("testByte", testByte);
-
-    if (testRunner.getResult())
-        std::cout << "Success\n";
 
     return testRunner.getResult() ? EXIT_SUCCESS : EXIT_FAILURE;
 }
