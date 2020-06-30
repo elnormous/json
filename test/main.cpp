@@ -14,7 +14,8 @@ namespace
     class TestRunner final
     {
     public:
-        TestRunner() noexcept = default;
+        TestRunner(int argc, char** argv) noexcept:
+            argumentCount(argc), arguments(argv) {}
         TestRunner(const TestRunner&) = delete;
         TestRunner& operator=(const TestRunner&) = delete;
         ~TestRunner()
@@ -26,6 +27,10 @@ namespace
         template <class T, class ...Args>
         void run(const std::string& name, T test, Args ...args) noexcept
         {
+            for (int i = 1; i < argumentCount; ++i)
+                if (name == arguments[i]) break;
+                else if (i == argumentCount - 1) return;
+
             try
             {
                 std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
@@ -47,6 +52,8 @@ namespace
         std::chrono::steady_clock::duration getDuration() const noexcept { return duration; }
 
     private:
+        int argumentCount;
+        char** arguments;
         bool result = true;
         std::chrono::steady_clock::duration duration = std::chrono::milliseconds(0);
     };
@@ -192,9 +199,9 @@ namespace
     }
 }
 
-int main()
+int main(int argc, char* argv[])
 {
-    TestRunner testRunner;
+    TestRunner testRunner(argc, argv);
     testRunner.run("testNull", testNull);
     testRunner.run("testInteger", testInteger);
     testRunner.run("testFloat", testFloat);
