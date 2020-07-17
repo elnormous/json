@@ -157,9 +157,19 @@ namespace
     {
         json::Value d = json::parse("\"ē–\"");
         if (d.getType() != json::Value::Type::string)
-            throw TestError("Expected an array");
+            throw TestError("Expected a string");
 
         if (d.as<std::string>() != "ē–")
+            throw TestError("Wrong value");
+    }
+
+    void testEscape()
+    {
+        json::Value d = json::parse("\"\\b\\f\\n\\r\\t\"");
+        if (d.getType() != json::Value::Type::string)
+            throw TestError("Expected a string");
+
+        if (d.as<std::string>() != "\b\f\n\r\t")
             throw TestError("Wrong value");
     }
 
@@ -212,6 +222,7 @@ int main(int argc, char* argv[])
     testRunner.run("testEmptyArray", testEmptyArray);
     testRunner.run("testArray", testArray);
     testRunner.run("testUnicode", testUnicode);
+    testRunner.run("testEscape", testEscape);
     testRunner.run("testEncoding", testEncoding);
     testRunner.run("testByte", testByte);
 
