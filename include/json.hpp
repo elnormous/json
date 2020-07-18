@@ -323,7 +323,14 @@ namespace json
             static Value parse(Iterator begin, Iterator end)
             {
                 auto iterator = hasByteOrderMark(begin, end) ? begin + 3 : begin;
-                return parseValue(iterator, end);
+                Value result = parseValue(iterator, end);
+
+                skipWhitespaces(iterator, end);
+
+                if (iterator != end)
+                    throw ParseError("Unexpected data");
+
+                return result;
             }
 
         private:
@@ -417,6 +424,8 @@ namespace json
                         static_cast<char>(*iterator) != '}')
                         throw ParseError("Invalid object");
 
+                    ++iterator;
+
                     return result;
                 }
                 else if (static_cast<char>(*iterator) == '[')
@@ -448,6 +457,8 @@ namespace json
                     if (iterator == end ||
                         static_cast<char>(*iterator) != ']')
                         throw ParseError("Invalid array");
+
+                    ++iterator;
 
                     return result;
                 }
