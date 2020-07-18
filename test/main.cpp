@@ -67,11 +67,11 @@ namespace
 
     void testInteger()
     {
-        json::Value d = json::parse("0");
+        json::Value d = json::parse("10");
         if (d.getType() != json::Value::Type::integer)
             throw TestError("Expected an integer");
 
-        if (d.as<int>() != 0)
+        if (d.as<int>() != 10)
             throw TestError("Expected 0");
     }
 
@@ -116,7 +116,7 @@ namespace
     void testObject()
     {
         json::Value d;
-        d = json::parse("{\"a\":\"b\"}");
+        d = json::parse("{\"a\":\"b\", \"c\":\"d\"}");
         if (d.getType() != json::Value::Type::object)
             throw TestError("Expected an object");
 
@@ -128,6 +128,15 @@ namespace
 
         if (d["a"].as<std::string>() != "b")
             throw TestError("Expected a value \"b\"");
+
+        if (!d.hasMember("c"))
+            throw TestError("Expected a member \"c\"");
+
+        if (d["c"].getType() != json::Value::Type::string)
+            throw TestError("Expected a string member");
+
+        if (d["c"].as<std::string>() != "d")
+            throw TestError("Expected a value \"d\"");
     }
 
     void testEmptyArray()
