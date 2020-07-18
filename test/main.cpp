@@ -77,12 +77,12 @@ namespace
 
     void testFloat()
     {
-        json::Value d = json::parse("0.0");
+        json::Value d = json::parse("0.5");
         if (d.getType() != json::Value::Type::floatingPoint)
             throw TestError("Expected a float");
 
-        if (d.as<float>() != 0.0F)
-            throw TestError("Expected 0.0");
+        if (d.as<float>() != 0.5F)
+            throw TestError("Expected 0.5");
 
         d = json::parse("0.1e1");
         if (d.as<float>() != 1.0F)
@@ -116,7 +116,7 @@ namespace
     void testObject()
     {
         json::Value d;
-        d = json::parse("{\"a\":\"b\", \"c\":\"d\"}");
+        d = json::parse("{\"a\":\"b\", \"c\": [1, 2], \"d\": {\"x\": \"y\"}}");
         if (d.getType() != json::Value::Type::object)
             throw TestError("Expected an object");
 
@@ -132,11 +132,14 @@ namespace
         if (!d.hasMember("c"))
             throw TestError("Expected a member \"c\"");
 
-        if (d["c"].getType() != json::Value::Type::string)
-            throw TestError("Expected a string member");
+        if (d["c"].getType() != json::Value::Type::array)
+            throw TestError("Expected an array member");
 
-        if (d["c"].as<std::string>() != "d")
-            throw TestError("Expected a value \"d\"");
+        if (!d.hasMember("d"))
+            throw TestError("Expected a member \"d\"");
+
+        if (d["d"].getType() != json::Value::Type::object)
+            throw TestError("Expected an object member");
     }
 
     void testEmptyArray()
