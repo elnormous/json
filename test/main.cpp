@@ -161,6 +161,12 @@ namespace
         if (d.as<json::Value::Array>().size() != 2)
             throw TestError("Expected an array with 2 elements");
 
+        if (d[0].getType() != json::Value::Type::integer)
+            throw TestError("Expected an integer");
+
+        if (d[1].getType() != json::Value::Type::integer)
+            throw TestError("Expected an integer");
+
         if (d[0].as<int>() != 1 || d[1].as<int>() != 2)
             throw TestError("Expected elements 1 and 2");
     }
