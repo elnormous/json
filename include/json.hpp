@@ -323,9 +323,10 @@ namespace json
             static Value parse(Iterator begin, Iterator end)
             {
                 auto iterator = hasByteOrderMark(begin, end) ? begin + 3 : begin;
-                Value result = parseValue(iterator, end);
+                Value result;
+                std::tie(result, iterator) = parseValue(iterator, end);
 
-                skipWhitespaces(iterator, end);
+                iterator = skipWhitespaces(iterator, end);
 
                 if (iterator != end)
                     throw ParseError("Unexpected data");
@@ -344,8 +345,9 @@ namespace json
                 return true;
             }
 
-            static void skipWhitespaces(Iterator& iterator, Iterator end)
+            static Iterator skipWhitespaces(Iterator begin, Iterator end)
             {
+                Iterator iterator = begin;
                 while (iterator != end)
                 {
                     if (static_cast<char>(*iterator) != ' ' &&
@@ -356,30 +358,29 @@ namespace json
 
                     ++iterator;
                 }
+                return iterator;
             }
 
-            static bool isSame(Iterator& iterator, Iterator end,
-                               const char* expectedBegin, const char* expectedEnd)
+            static std::pair<bool, Iterator> isSame(Iterator begin, Iterator end,
+                                                    const char* expectedBegin, const char* expectedEnd)
             {
-                auto currentIterator = iterator;
+                auto iterator = begin;
 
-                while (currentIterator != end && expectedBegin != expectedEnd)
+                while (iterator != end && expectedBegin != expectedEnd)
                 {
-                    if (static_cast<char>(*currentIterator) != *expectedBegin)
-                        return false;
+                    if (static_cast<char>(*iterator) != *expectedBegin)
+                        return std::make_pair(false, iterator);
 
-                    ++currentIterator;
+                    ++iterator;
                     ++expectedBegin;
                 }
 
-                iterator = currentIterator;
-
-                return true;
+                return std::make_pair(true, iterator);
             }
 
-            static Value parseValue(Iterator& iterator, Iterator end)
+            static std::pair<Value, Iterator> parseValue(Iterator begin, Iterator end)
             {
-                skipWhitespaces(iterator, end);
+                Iterator iterator = skipWhitespaces(begin, end);
 
                 if (iterator == end)
                     throw ParseError("Unexpected end of data");
@@ -395,7 +396,7 @@ namespace json
                     while (iterator != end &&
                            static_cast<char>(*iterator) != '}')
                     {
-                        skipWhitespaces(iterator, end);
+                        iterator = skipWhitespaces(iterator, end);
 
                         if (firstValue)
                             firstValue = false;
@@ -404,20 +405,20 @@ namespace json
                             if (static_cast<char>(*iterator++) != ',')
                                 throw ParseError("Invalid object");
 
-                            skipWhitespaces(iterator, end);
+                            iterator = skipWhitespaces(iterator, end);
                         }
 
+                        std::string key;
+                        std::tie(key, iterator) = parseString(iterator, end);
 
-                        std::string key = parseString(iterator, end);
-
-                        skipWhitespaces(iterator, end);
+                        iterator = skipWhitespaces(iterator, end);
 
                         if (static_cast<char>(*iterator++) != ':')
                             throw ParseError("Invalid object");
 
-                        skipWhitespaces(iterator, end);
+                        iterator = skipWhitespaces(iterator, end);
 
-                        result[key] = parseValue(iterator, end);
+                        std::tie(result[key], iterator) = parseValue(iterator, end);
                     }
 
                     if (iterator == end ||
@@ -426,7 +427,7 @@ namespace json
 
                     ++iterator;
 
-                    return result;
+                    return std::make_pair(result, iterator);
                 }
                 else if (static_cast<char>(*iterator) == '[')
                 {
@@ -439,7 +440,7 @@ namespace json
                     while (iterator != end &&
                            static_cast<char>(*iterator) != ']')
                     {
-                        skipWhitespaces(iterator, end);
+                        iterator = skipWhitespaces(iterator, end);
 
                         if (firstValue)
                             firstValue = false;
@@ -448,10 +449,12 @@ namespace json
                             if (static_cast<char>(*iterator++) != ',')
                                 throw ParseError("Invalid object");
 
-                            skipWhitespaces(iterator, end);
+                            iterator = skipWhitespaces(iterator, end);
                         }
 
-                        result.pushBack(parseValue(iterator, end));
+                        Value value;
+                        std::tie(value, iterator) = parseValue(iterator, end);
+                        result.pushBack(value);
                     }
 
                     if (iterator == end ||
@@ -460,7 +463,7 @@ namespace json
 
                     ++iterator;
 
-                    return result;
+                    return std::make_pair(result, iterator);
                 }
                 else if (static_cast<char>(*iterator) == '-' ||
                          (static_cast<char>(*iterator) >= '0' &&
@@ -501,9 +504,7 @@ namespace json
                         }
                     }
                     else
-                    {
-                        return Value{std::stoll(value)};
-                    }
+                        return std::make_pair(Value{std::stoll(value)}, iterator);
 
                     // parse exponent
                     if (iterator != end &&
@@ -533,30 +534,44 @@ namespace json
                         }
                     }
 
-                    return Value{std::stod(value)};;
+                    return std::make_pair(Value{std::stod(value)}, iterator);
                 }
                 else if (static_cast<char>(*iterator) == '"')
-                    return Value{parseString(iterator, end)};
+                {
+                    std::string stringValue;
+                    std::tie(stringValue, iterator) = parseString(iterator, end);
+                    return std::make_pair(Value{stringValue}, iterator);
+                }
                 else
                 {
                     constexpr char trueString[] = {'t', 'r', 'u', 'e'};
                     constexpr char falseString[] = {'f', 'a', 'l', 's', 'e'};
                     constexpr char nullString[] = {'n', 'u', 'l', 'l'};
 
-                    if (isSame(iterator, end, std::begin(trueString), std::end(trueString)))
-                        return Value{true};
-                    else if (isSame(iterator, end, std::begin(falseString), std::end(falseString)))
-                        return Value{false};
-                    else if (isSame(iterator, end, std::begin(nullString), std::end(nullString)))
-                        return Value{nullptr};
-                    else
-                        throw ParseError("Unexpected identifier");
+                    bool isTrue;
+                    std::tie(isTrue, iterator) = isSame(iterator, end, std::begin(trueString), std::end(trueString));
+                    if (isTrue)
+                        return std::make_pair(Value{true}, iterator);
+
+                    bool isFalse;
+                    std::tie(isFalse, iterator) = isSame(iterator, end, std::begin(falseString), std::end(falseString));
+                    if (isFalse)
+                        return std::make_pair(Value{false}, iterator);
+
+                    bool isNull;
+                    std::tie(isNull, iterator) = isSame(iterator, end, std::begin(nullString), std::end(nullString));
+                    if (isNull)
+                        return std::make_pair(Value{nullptr}, iterator);
+
+                    throw ParseError("Unexpected identifier");
                 }
             }
 
-            static std::string parseString(Iterator& iterator, Iterator end)
+            static std::pair<std::string, Iterator> parseString(Iterator begin, Iterator end)
             {
                 std::string result;
+                Iterator iterator = begin;
+
 
                 if (iterator == end ||
                     static_cast<char>(*iterator) != '"')
@@ -648,7 +663,7 @@ namespace json
 
                 ++iterator;
 
-                return result;
+                return std::make_pair(result, iterator);
             }
         };
 
