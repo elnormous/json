@@ -154,11 +154,11 @@ namespace
 
     void testArray()
     {
-        json::Value d = json::parse("[1, 2]");
+        json::Value d = json::parse("[1, 2, {}, \"\"]");
         if (d.getType() != json::Value::Type::array)
             throw TestError("Expected an array");
 
-        if (d.as<json::Value::Array>().size() != 2)
+        if (d.as<json::Value::Array>().size() != 4)
             throw TestError("Expected an array with 2 elements");
 
         if (d[0].getType() != json::Value::Type::integer)
@@ -169,6 +169,12 @@ namespace
 
         if (d[0].as<int>() != 1 || d[1].as<int>() != 2)
             throw TestError("Expected elements 1 and 2");
+
+        if (d[2].getType() != json::Value::Type::object)
+            throw TestError("Expected an object");
+
+        if (d[3].getType() != json::Value::Type::string)
+            throw TestError("Expected a string");
     }
 
     void testUnicode()
