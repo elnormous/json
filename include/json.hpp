@@ -393,10 +393,9 @@ namespace json
 
                     bool firstValue = true;
 
-                    while (iterator != end && static_cast<char>(*iterator) != '}')
+                    while ((iterator = skipWhitespaces(iterator, end)) != end &&
+                           static_cast<char>(*iterator) != '}')
                     {
-                        iterator = skipWhitespaces(iterator, end);
-
                         if (firstValue)
                             firstValue = false;
                         else
@@ -433,10 +432,9 @@ namespace json
 
                     bool firstValue = true;
 
-                    while (iterator != end && static_cast<char>(*iterator) != ']')
+                    while ((iterator = skipWhitespaces(iterator, end)) != end &&
+                           static_cast<char>(*iterator) != ']')
                     {
-                        iterator = skipWhitespaces(iterator, end);
-
                         if (firstValue)
                             firstValue = false;
                         else
