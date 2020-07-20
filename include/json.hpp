@@ -393,8 +393,7 @@ namespace json
 
                     bool firstValue = true;
 
-                    while (iterator != end &&
-                           static_cast<char>(*iterator) != '}')
+                    while (iterator != end && static_cast<char>(*iterator) != '}')
                     {
                         iterator = skipWhitespaces(iterator, end);
 
@@ -421,11 +420,8 @@ namespace json
                         std::tie(result[key], iterator) = parseValue(iterator, end);
                     }
 
-                    if (iterator == end ||
-                        static_cast<char>(*iterator) != '}')
+                    if (iterator == end || static_cast<char>(*iterator++) != '}')
                         throw ParseError("Invalid object");
-
-                    ++iterator;
 
                     return std::make_pair(result, iterator);
                 }
@@ -437,8 +433,7 @@ namespace json
 
                     bool firstValue = true;
 
-                    while (iterator != end &&
-                           static_cast<char>(*iterator) != ']')
+                    while (iterator != end && static_cast<char>(*iterator) != ']')
                     {
                         iterator = skipWhitespaces(iterator, end);
 
@@ -457,11 +452,8 @@ namespace json
                         result.pushBack(value);
                     }
 
-                    if (iterator == end ||
-                        static_cast<char>(*iterator) != ']')
+                    if (iterator == end || static_cast<char>(*iterator++) != ']')
                         throw ParseError("Invalid array");
-
-                    ++iterator;
 
                     return std::make_pair(result, iterator);
                 }
@@ -572,15 +564,12 @@ namespace json
                 std::string result;
                 Iterator iterator = begin;
 
-
-                if (iterator == end ||
-                    static_cast<char>(*iterator) != '"')
+                if (iterator == end || static_cast<char>(*iterator) != '"')
                     throw ParseError("Invalid string");
 
                 ++iterator;
 
-                while (iterator != end &&
-                       static_cast<char>(*iterator) != '"')
+                while (iterator != end && static_cast<char>(*iterator) != '"')
                 {
                     if (static_cast<char>(*iterator) == '\\')
                     {
@@ -657,11 +646,8 @@ namespace json
                     ++iterator;
                 }
 
-                if (iterator == end ||
-                    static_cast<char>(*iterator) != '"')
+                if (iterator == end || static_cast<char>(*iterator++) != '"')
                     throw ParseError("Invalid string");
-
-                ++iterator;
 
                 return std::make_pair(result, iterator);
             }
