@@ -116,7 +116,7 @@ namespace
     void testObject()
     {
         json::Value d;
-        d = json::parse("{\"a\":\"b\", \"c\": [1, 2], \"d\": {\"x\": \"y\"}}");
+        d = json::parse("{\"a\" : \"b\", \"c\": [1, 2], \"d\": {\"x\"\r: \"y\"}}");
         if (d.getType() != json::Value::Type::object)
             throw TestError("Expected an object");
 
@@ -154,7 +154,7 @@ namespace
 
     void testArray()
     {
-        json::Value d = json::parse("[1, 2, {}, \"\"]");
+        json::Value d = json::parse("[1, 2\t , {}\n, \"\"]");
         if (d.getType() != json::Value::Type::array)
             throw TestError("Expected an array");
 
