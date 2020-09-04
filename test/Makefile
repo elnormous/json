@@ -1,5 +1,5 @@
 debug=0
-CXXFLAGS=-c -std=c++11 -Wall -Wno-c++98-compat -O2 -I../include
+CXXFLAGS=-c -std=c++17 -Wall -Wno-c++98-compat -O2 -I../include
 LDFLAGS=-O2
 SOURCES=main.cpp
 BASE_NAMES=$(basename $(SOURCES))
