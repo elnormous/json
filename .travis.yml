@@ -3,11 +3,18 @@ compiler: gcc
 os: linux
 
 addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-7
   sonarcloud:
     organization: "elnormous-github"
     token:
       secure: "yYXtRo2zlm9n6DzXz4ytlXe+S3NxlNqwbAqbNTxxcPuwZmmjiARyMEsx8Tir/poKH2e3vT+Vt7P7Y9ABTapxwxLnciqoiXy0Q9MXBFH+1YxkKGHHpFrSJP7Fg3Mqu6wdGlEuILVuUTu+FuFmt0E/Z9rPS0byf4PdMujqViUKG8v1niKDPwvc9K7fTUwQpaFRgSVMdT7UdsFmE2df41SMivzlcfdI6zkTIdQh83dwCRdzsgdneHyd3bgIAXFcJ1Xr0glenfFZynzGsu9eCUnU0VNi0ellwRp+UQoqa0CcRbwP9pNynMiJfmVn6CAyW1ZXBxX/VPygTJ7u6mK8hYdsjsS+9ClGQlhqHRsF5lSBABIGBnUM3p2YfdvNdLilOGUEqCuTppCu/kJKfGNxanC59I9ubMiusEJ0xwaGcn+FfTmz7J5ksvc2qbKAiavR+0BpZfltCfjoaT5ciKISECkT7oBg5TKktfumzDhxQN6I7Z5mAFiKcFpp/kV0BjGCdINK8IlR6tePjiT9KzJwLJ/AfCrMOJmsvfqcfS0banUVpFVUOVFC+9Hw/FHILaowo1fveqa11OoecXx89aDOMDuHDGHZBgjzrhD2uoA6A5aqP/smN9XDske+bEKSoJcteEp4ddSuvwH1crgKBDLCOcpF9tEz5EUlapnIy0hV1JCZNF8="
 
+before_script:
+  - export CXX=g++-7
 script:
   - build-wrapper-linux-x86-64 --out-dir bw-output make -C test
   - test/test
