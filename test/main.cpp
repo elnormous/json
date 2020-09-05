@@ -233,6 +233,20 @@ namespace
         if (d.getType() != json::Value::Type::object)
             throw TestError("Expected an object");
     }
+
+    void testParseError()
+    {
+        try
+        {
+            json::parse("{");
+        }
+        catch (json::ParseError)
+        {
+            return;
+        }
+
+        throw TestError("Expected a parse error");
+    }
 }
 
 int main(int argc, char* argv[])
@@ -251,6 +265,7 @@ int main(int argc, char* argv[])
     testRunner.run("testEscape", testEscape);
     testRunner.run("testEncoding", testEncoding);
     testRunner.run("testByte", testByte);
+    testRunner.run("testParseError", testParseError);
 
     return testRunner.getFailed() ? EXIT_FAILURE : EXIT_SUCCESS;
 }
