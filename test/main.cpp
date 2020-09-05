@@ -234,18 +234,28 @@ namespace
             throw TestError("Expected an object");
     }
 
-    void testParseError()
+    void testParseBraceError()
     {
         try
         {
             json::parse("{");
+            throw TestError("Expected a parse error");
         }
-        catch (json::ParseError)
+        catch (const json::ParseError&)
         {
-            return;
         }
+    }
 
-        throw TestError("Expected a parse error");
+    void testParseObjectError()
+    {
+        try
+        {
+            json::parse("{\"\"}");
+            throw TestError("Expected a parse error");
+        }
+        catch (const json::ParseError&)
+        {
+        }
     }
 }
 
@@ -265,7 +275,8 @@ int main(int argc, char* argv[])
     testRunner.run("testEscape", testEscape);
     testRunner.run("testEncoding", testEncoding);
     testRunner.run("testByte", testByte);
-    testRunner.run("testParseError", testParseError);
+    testRunner.run("testParseBraceError", testParseBraceError);
+    testRunner.run("testParseObjectError", testParseObjectError);
 
     return testRunner.getFailed() ? EXIT_FAILURE : EXIT_SUCCESS;
 }
