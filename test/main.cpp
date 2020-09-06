@@ -261,7 +261,7 @@ namespace
     void testSetters()
     {
         json::Value n = nullptr;
-        if (n.getType() != json::Value::Type::null)
+        if (n.getType() != json::Value::Type::null || !n.isNull())
             throw TestError("Expected a null type");
 
         json::Value i = 10;
@@ -286,6 +286,35 @@ namespace
 
         json::Value b = false;
         if (b.getType() != json::Value::Type::boolean)
+            throw TestError("Expected a boolean type");
+
+        json::Value v;
+        v = nullptr;
+        if (v.getType() != json::Value::Type::null || !n.isNull())
+            throw TestError("Expected a null type");
+
+        v = 10;
+        if (v.getType() != json::Value::Type::integer)
+            throw TestError("Expected an integer type");
+
+        v = 10.0;
+        if (v.getType() != json::Value::Type::floatingPoint)
+            throw TestError("Expected a float type");
+
+        v = "s";
+        if (v.getType() != json::Value::Type::string)
+            throw TestError("Expected a string type");
+
+        v = std::map<std::string, json::Value>{};
+        if (v.getType() != json::Value::Type::object)
+            throw TestError("Expected an object type");
+
+        v = std::vector<json::Value>{};
+        if (v.getType() != json::Value::Type::array)
+            throw TestError("Expected an array type");
+
+        v = false;
+        if (v.getType() != json::Value::Type::boolean)
             throw TestError("Expected a boolean type");
     }
 }
