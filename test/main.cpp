@@ -257,6 +257,37 @@ namespace
         {
         }
     }
+
+    void testSetters()
+    {
+        json::Value n = nullptr;
+        if (n.getType() != json::Value::Type::null)
+            throw TestError("Expected a null type");
+
+        json::Value i = 10;
+        if (i.getType() != json::Value::Type::integer)
+            throw TestError("Expected an integer type");
+
+        json::Value f = 10.0;
+        if (f.getType() != json::Value::Type::floatingPoint)
+            throw TestError("Expected a float type");
+
+        json::Value s = "s";
+        if (s.getType() != json::Value::Type::string)
+            throw TestError("Expected a string type");
+
+        json::Value o = std::map<std::string, json::Value>{};
+        if (o.getType() != json::Value::Type::object)
+            throw TestError("Expected an object type");
+
+        json::Value a = std::vector<json::Value>{};
+        if (a.getType() != json::Value::Type::array)
+            throw TestError("Expected an array type");
+
+        json::Value b = false;
+        if (b.getType() != json::Value::Type::boolean)
+            throw TestError("Expected a boolean type");
+    }
 }
 
 int main(int argc, char* argv[])
@@ -277,6 +308,7 @@ int main(int argc, char* argv[])
     testRunner.run("testByte", testByte);
     testRunner.run("testParseBraceError", testParseBraceError);
     testRunner.run("testParseObjectError", testParseObjectError);
+    testRunner.run("testSetters", testSetters);
 
     return testRunner.getFailed() ? EXIT_FAILURE : EXIT_SUCCESS;
 }
