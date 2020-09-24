@@ -10,3 +10,5 @@ test/x64
 test/test.VC.db
 test/test.VC.VC.opendb
 *.user
+*.gcda
+*.gcno
