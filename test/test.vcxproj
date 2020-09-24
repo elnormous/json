@@ -22,6 +22,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\external\Catch2\include" />
     <ClInclude Include="..\include\json.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

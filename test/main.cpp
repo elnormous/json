@@ -1,5 +1,6 @@
 #include <chrono>
 #include <iostream>
+#include "catch.hpp"
 #include "json.hpp"
 
 namespace
