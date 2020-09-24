@@ -1,7 +1,7 @@
 debug=0
-CXXFLAGS=-c -std=c++17 -Wall -Wno-c++98-compat -O2 -I../external/Catch2/include -I../include
+CXXFLAGS=-c -std=c++17 -Wall -Wno-c++98-compat -O2 -I../external/Catch2/single_include -I../include
 LDFLAGS=-O2
-SOURCES=main.cpp
+SOURCES=main.cpp tests.cpp
 BASE_NAMES=$(basename $(SOURCES))
 OBJECTS=$(BASE_NAMES:=.o)
 EXECUTABLE=test

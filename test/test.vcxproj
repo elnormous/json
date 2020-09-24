@@ -20,9 +20,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="tests.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\external\Catch2\include" />
+    <ClInclude Include="..\external\Catch2\single_include" />
     <ClInclude Include="..\include\json.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
