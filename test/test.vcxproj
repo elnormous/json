@@ -23,7 +23,6 @@
     <ClCompile Include="tests.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\external\Catch2\single_include" />
     <ClInclude Include="..\include\json.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -79,19 +78,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>../include;$(IncludePath)</IncludePath>
+    <IncludePath>..\external\Catch2\single_include;..\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>../include;$(IncludePath)</IncludePath>
+    <IncludePath>..\external\Catch2\single_include;..\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>../include;$(IncludePath)</IncludePath>
+    <IncludePath>..\external\Catch2\single_include;..\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>../include;$(IncludePath)</IncludePath>
+    <IncludePath>..\external\Catch2\single_include;..\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
