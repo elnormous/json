@@ -28,9 +28,19 @@ TEST_CASE("Float", "[float]")
 
 TEST_CASE("Bool", "[bool]")
 {
-    const json::Value d = json::parse("false");
-    REQUIRE(d.getType() == json::Value::Type::boolean);
-    REQUIRE_FALSE(d.as<bool>());
+    SECTION("True")
+    {
+        const json::Value d = json::parse("true");
+        REQUIRE(d.getType() == json::Value::Type::boolean);
+        REQUIRE(d.as<bool>());
+    }
+
+    SECTION("False")
+    {
+        const json::Value d = json::parse("false");
+        REQUIRE(d.getType() == json::Value::Type::boolean);
+        REQUIRE_FALSE(d.as<bool>());
+    }
 }
 
 TEST_CASE("String", "[string]")
