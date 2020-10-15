@@ -19,11 +19,18 @@ TEST_CASE("Integer", "[integer]")
 
 TEST_CASE("Float", "[float]")
 {
-    const json::Value d = json::parse("0.5");
-    REQUIRE(d.getType() == json::Value::Type::floatingPoint);
-    REQUIRE(d.as<float>() == Approx(0.5F));
-    const auto e = json::parse("0.1e1");
-    REQUIRE(e.as<float>() == Approx(1.0F));
+    SECTION("Float")
+    {
+        const json::Value d = json::parse("0.5");
+        REQUIRE(d.getType() == json::Value::Type::floatingPoint);
+        REQUIRE(d.as<float>() == Approx(0.5F));
+    }
+
+    SECTION("Exponent")
+    {
+        const auto e = json::parse("0.1e1");
+        REQUIRE(e.as<float>() == Approx(1.0F));
+    }
 }
 
 TEST_CASE("Bool", "[bool]")
