@@ -133,50 +133,113 @@ TEST_CASE("ParseObjectError", "[parse_object_error]")
     REQUIRE_THROWS_AS(json::parse("{\"\"}"), json::ParseError);
 }
 
+TEST_CASE("Constructors")
+{
+    SECTION("Null")
+    {
+        json::Value v = nullptr;
+        REQUIRE(v.getType() == json::Value::Type::null);
+        REQUIRE(v.isNull());
+    }
+
+    SECTION("Integer")
+    {
+        json::Value v = 10;
+        REQUIRE(v.getType() == json::Value::Type::integer);
+        REQUIRE(v.as<int>() == 10);
+    }
+
+    SECTION("FloatingPoint")
+    {
+        json::Value v = 10.0;
+        REQUIRE(v.getType() == json::Value::Type::floatingPoint);
+        REQUIRE(v.as<double>() == 10.0);
+    }
+
+    SECTION("String")
+    {
+        json::Value v = "s";
+        REQUIRE(v.getType() == json::Value::Type::string);
+        REQUIRE(v.as<std::string>() == "s");
+    }
+
+    SECTION("Object")
+    {
+        json::Value v = std::map<std::string, json::Value>{};
+        REQUIRE(v.getType() == json::Value::Type::object);
+        REQUIRE(v.as<json::Value::Object>().empty());
+    }
+
+    SECTION("Array")
+    {
+        json::Value v = std::vector<json::Value>{};
+        REQUIRE(v.getType() == json::Value::Type::array);
+        REQUIRE(v.as<json::Value::Array>().empty());
+    }
+
+    SECTION("Boolean")
+    {
+        json::Value v = false;
+        REQUIRE(v.getType() == json::Value::Type::boolean);
+        REQUIRE(v.as<bool>() == false);
+    }
+}
+
 TEST_CASE("Setters")
 {
-    json::Value n = nullptr;
-    REQUIRE(n.getType() == json::Value::Type::null);
-    REQUIRE(n.isNull());
+    SECTION("Null")
+    {
+        json::Value v;
+        v = nullptr;
+        REQUIRE(v.getType() == json::Value::Type::null);
+        REQUIRE(v.isNull());
+    }
 
-    json::Value i = 10;
-    REQUIRE(i.getType() == json::Value::Type::integer);
+    SECTION("Integer")
+    {
+        json::Value v;
+        v = 10;
+        REQUIRE(v.getType() == json::Value::Type::integer);
+        REQUIRE(v.as<int>() == 10);
+    }
 
-    json::Value f = 10.0;
-    REQUIRE(f.getType() == json::Value::Type::floatingPoint);
+    SECTION("FloatingPoint")
+    {
+        json::Value v;
+        v = 10.0;
+        REQUIRE(v.getType() == json::Value::Type::floatingPoint);
+        REQUIRE(v.as<double>() == 10.0);
+    }
 
-    json::Value s = "s";
-    REQUIRE(s.getType() == json::Value::Type::string);
+    SECTION("String")
+    {
+        json::Value v;
+        v = "s";
+        REQUIRE(v.getType() == json::Value::Type::string);
+        REQUIRE(v.as<std::string>() == "s");
+    }
 
-    json::Value o = std::map<std::string, json::Value>{};
-    REQUIRE(o.getType() == json::Value::Type::object);
+    SECTION("Object")
+    {
+        json::Value v;
+        v = std::map<std::string, json::Value>{};
+        REQUIRE(v.getType() == json::Value::Type::object);
+        REQUIRE(v.as<json::Value::Object>().empty());
+    }
 
-    json::Value a = std::vector<json::Value>{};
-    REQUIRE(a.getType() == json::Value::Type::array);
+    SECTION("Array")
+    {
+        json::Value v;
+        v = std::vector<json::Value>{};
+        REQUIRE(v.getType() == json::Value::Type::array);
+        REQUIRE(v.as<json::Value::Array>().empty());
+    }
 
-    json::Value b = false;
-    REQUIRE(b.getType() == json::Value::Type::boolean);
-
-    json::Value v;
-    v = nullptr;
-    REQUIRE(v.getType() == json::Value::Type::null);
-    REQUIRE(v.isNull());
-
-    v = 10;
-    REQUIRE(v.getType() == json::Value::Type::integer);
-
-    v = 10.0;
-    REQUIRE(v.getType() == json::Value::Type::floatingPoint);
-
-    v = "s";
-    REQUIRE(v.getType() == json::Value::Type::string);
-
-    v = std::map<std::string, json::Value>{};
-    REQUIRE(v.getType() == json::Value::Type::object);
-
-    v = std::vector<json::Value>{};
-    REQUIRE(v.getType() == json::Value::Type::array);
-
-    v = false;
-    REQUIRE(v.getType() == json::Value::Type::boolean);
+    SECTION("Boolean")
+    {
+        json::Value v;
+        v = false;
+        REQUIRE(v.getType() == json::Value::Type::boolean);
+        REQUIRE(v.as<bool>() == false);
+    }
 }
