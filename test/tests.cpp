@@ -160,7 +160,7 @@ TEST_CASE("Setters")
     json::Value v;
     v = nullptr;
     REQUIRE(v.getType() == json::Value::Type::null);
-    REQUIRE(n.isNull());
+    REQUIRE(v.isNull());
 
     v = 10;
     REQUIRE(v.getType() == json::Value::Type::integer);
