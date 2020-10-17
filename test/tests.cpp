@@ -198,7 +198,7 @@ TEST_CASE("Constructors")
     {
         json::Value v = false;
         REQUIRE(v.getType() == json::Value::Type::boolean);
-        REQUIRE(v.as<bool>() == false);
+        REQUIRE_FALSE(v.as<bool>());
     }
 }
 
@@ -257,6 +257,33 @@ TEST_CASE("Setters")
         json::Value v;
         v = false;
         REQUIRE(v.getType() == json::Value::Type::boolean);
-        REQUIRE(v.as<bool>() == false);
+        REQUIRE_FALSE(v.as<bool>());
+    }
+}
+
+TEST_CASE("BoolCast")
+{
+    SECTION("ZeroFloat")
+    {
+        json::Value v = 0.0;
+        REQUIRE_FALSE(v.as<bool>());
+    }
+
+    SECTION("PositiveFloat")
+    {
+        json::Value v = 1.0;
+        REQUIRE(v.as<bool>());
+    }
+
+    SECTION("ZeroInteger")
+    {
+        json::Value v = 0;
+        REQUIRE_FALSE(v.as<bool>());
+    }
+
+    SECTION("PositiveInteger")
+    {
+        json::Value v = 1;
+        REQUIRE(v.as<bool>());
     }
 }
