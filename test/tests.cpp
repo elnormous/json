@@ -150,6 +150,29 @@ TEST_CASE("ParseObjectError", "[parse_object_error]")
     REQUIRE_THROWS_AS(json::parse("{\"\"}"), json::ParseError);
 }
 
+TEST_CASE("TypeError", "[type_error]")
+{
+    SECTION("Null")
+    {
+        const json::Value v = nullptr;
+        REQUIRE_THROWS_AS(v.as<std::string>(), json::TypeError);
+    }
+
+    SECTION("String")
+    {
+        const json::Value v = 0;
+        REQUIRE_THROWS_AS(v.as<std::string>(), json::TypeError);
+    }
+
+    SECTION("String")
+    {
+        const json::Value v = "";
+        REQUIRE_THROWS_AS(v.as<bool>(), json::TypeError);
+        REQUIRE_THROWS_AS(v.as<int>(), json::TypeError);
+        REQUIRE_THROWS_AS(v.as<float>(), json::TypeError);
+    }
+}
+
 TEST_CASE("Constructors")
 {
     SECTION("Null")
