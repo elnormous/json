@@ -156,12 +156,14 @@ TEST_CASE("TypeError", "[type_error]")
     {
         const json::Value v = nullptr;
         REQUIRE_THROWS_AS(v.as<std::string>(), json::TypeError);
+        REQUIRE_THROWS_AS(v[0], json::TypeError);
     }
 
     SECTION("String")
     {
         const json::Value v = 0;
         REQUIRE_THROWS_AS(v.as<std::string>(), json::TypeError);
+
     }
 
     SECTION("String")
@@ -170,7 +172,14 @@ TEST_CASE("TypeError", "[type_error]")
         REQUIRE_THROWS_AS(v.as<bool>(), json::TypeError);
         REQUIRE_THROWS_AS(v.as<int>(), json::TypeError);
         REQUIRE_THROWS_AS(v.as<float>(), json::TypeError);
+        REQUIRE_THROWS_AS(v[0], json::TypeError);
     }
+}
+
+TEST_CASE("RangeError", "[range_error]")
+{
+    const json::Value v = json::Value::Array{};
+    REQUIRE_THROWS_AS(v[0], json::RangeError);
 }
 
 TEST_CASE("Constructors")
@@ -205,14 +214,14 @@ TEST_CASE("Constructors")
 
     SECTION("Object")
     {
-        json::Value v = std::map<std::string, json::Value>{};
+        json::Value v = json::Value::Object{};
         REQUIRE(v.getType() == json::Value::Type::object);
         REQUIRE(v.as<json::Value::Object>().empty());
     }
 
     SECTION("Array")
     {
-        json::Value v = std::vector<json::Value>{};
+        json::Value v = json::Value::Array{};
         REQUIRE(v.getType() == json::Value::Type::array);
         REQUIRE(v.as<json::Value::Array>().empty());
     }
@@ -262,7 +271,7 @@ TEST_CASE("Setters")
     SECTION("Object")
     {
         json::Value v;
-        v = std::map<std::string, json::Value>{};
+        v = json::Value::Object{};
         REQUIRE(v.getType() == json::Value::Type::object);
         REQUIRE(v.as<json::Value::Object>().empty());
     }
@@ -270,7 +279,7 @@ TEST_CASE("Setters")
     SECTION("Array")
     {
         json::Value v;
-        v = std::vector<json::Value>{};
+        v = json::Value::Array{};
         REQUIRE(v.getType() == json::Value::Type::array);
         REQUIRE(v.as<json::Value::Array>().empty());
     }
