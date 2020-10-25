@@ -1,9 +1,10 @@
 debug=0
-CXXFLAGS=-c -std=c++17 -Wall -Wno-c++98-compat -O2 -I../external/Catch2/single_include -I../include
+CXXFLAGS=-std=c++17 -Wall -Wno-c++98-compat -O2 -I../external/Catch2/single_include -I../include
 LDFLAGS=-O2
 SOURCES=main.cpp tests.cpp
 BASE_NAMES=$(basename $(SOURCES))
 OBJECTS=$(BASE_NAMES:=.o)
+DEPENDENCIES=$(OBJECTS:.o=.d)
 EXECUTABLE=test
 
 all: $(EXECUTABLE)
@@ -14,8 +15,10 @@ endif
 $(EXECUTABLE): $(OBJECTS)
 	$(CXX) $(OBJECTS) $(LDFLAGS) -o $@ -fprofile-arcs -ftest-coverage
 
+-include $(DEPENDENCIES)
+
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) $< -o $@ -fprofile-arcs -ftest-coverage
+	$(CXX) -c $(CXXFLAGS) -MMD -MP $< -o $@ -fprofile-arcs -ftest-coverage
 
 .PHONY: clean
 clean:

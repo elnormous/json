@@ -12,3 +12,4 @@ test/test.VC.VC.opendb
 *.user
 *.gcda
 *.gcno
+*.d
