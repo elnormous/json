@@ -366,13 +366,13 @@ namespace json
                 while (iterator != end && expectedBegin != expectedEnd)
                 {
                     if (static_cast<char>(*iterator) != *expectedBegin)
-                        return std::make_pair(false, iterator);
+                        return std::pair(false, iterator);
 
                     ++iterator;
                     ++expectedBegin;
                 }
 
-                return std::make_pair(true, iterator);
+                return std::pair(true, iterator);
             }
 
             static std::pair<Value, Iterator> parseValue(Iterator begin, Iterator end)
@@ -421,7 +421,7 @@ namespace json
 
                     ++iterator;
 
-                    return std::make_pair(result, iterator);
+                    return std::pair(result, iterator);
                 }
                 else if (static_cast<char>(*iterator) == '[')
                 {
@@ -454,7 +454,7 @@ namespace json
 
                     ++iterator;
 
-                    return std::make_pair(result, iterator);
+                    return std::pair(result, iterator);
                 }
                 else if (static_cast<char>(*iterator) == '-' ||
                          (static_cast<char>(*iterator) >= '0' &&
@@ -495,7 +495,7 @@ namespace json
                         }
                     }
                     else
-                        return std::make_pair(Value{std::stoll(value)}, iterator);
+                        return std::pair(Value{std::stoll(value)}, iterator);
 
                     // parse exponent
                     if (iterator != end &&
@@ -525,13 +525,13 @@ namespace json
                         }
                     }
 
-                    return std::make_pair(Value{std::stod(value)}, iterator);
+                    return std::pair(Value{std::stod(value)}, iterator);
                 }
                 else if (static_cast<char>(*iterator) == '"')
                 {
                     auto [stringValue, stringIterator] = parseString(iterator, end);
                     iterator = stringIterator;
-                    return std::make_pair(Value{stringValue}, iterator);
+                    return std::pair(Value{stringValue}, iterator);
                 }
                 else
                 {
@@ -542,17 +542,17 @@ namespace json
                     auto [isTrue, trueIterator] = isSame(iterator, end, std::begin(trueString), std::end(trueString));
                     iterator = trueIterator;
                     if (isTrue)
-                        return std::make_pair(Value{true}, iterator);
+                        return std::pair(Value{true}, iterator);
 
                     auto [isFalse, falseIterator] = isSame(iterator, end, std::begin(falseString), std::end(falseString));
                     iterator = falseIterator;
                     if (isFalse)
-                        return std::make_pair(Value{false}, iterator);
+                        return std::pair(Value{false}, iterator);
 
                     auto [isNull, nullIterator] = isSame(iterator, end, std::begin(nullString), std::end(nullString));
                     iterator = nullIterator;
                     if (isNull)
-                        return std::make_pair(Value{nullptr}, iterator);
+                        return std::pair(Value{nullptr}, iterator);
 
                     throw ParseError("Unexpected identifier");
                 }
@@ -650,7 +650,7 @@ namespace json
 
                 ++iterator;
 
-                return std::make_pair(result, iterator);
+                return std::pair(result, iterator);
             }
         };
 
