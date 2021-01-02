@@ -244,13 +244,13 @@ namespace json
             return objectValue.find(member) != objectValue.end();
         }
 
-        Value& operator[](const std::string& member)
+        Value& operator[](const std::string& member) &
         {
             type = Type::object;
             return objectValue[member];
         }
 
-        const Value& operator[](const std::string& member) const
+        const Value& operator[](const std::string& member) const&
         {
             if (type != Type::object) throw TypeError("Wrong type");
 
@@ -261,14 +261,14 @@ namespace json
                 throw RangeError("Member does not exist");
         }
 
-        Value& operator[](std::size_t index)
+        Value& operator[](std::size_t index) &
         {
             type = Type::array;
             if (index >= arrayValue.size()) arrayValue.resize(index + 1);
             return arrayValue[index];
         }
 
-        const Value& operator[](std::size_t index) const
+        const Value& operator[](std::size_t index) const&
         {
             if (type != Type::array) throw TypeError("Wrong type");
 
@@ -284,13 +284,13 @@ namespace json
             return arrayValue.size();
         }
 
-        void resize(std::size_t size)
+        void resize(std::size_t size) &
         {
             if (type != Type::array) throw TypeError("Wrong type");
             arrayValue.resize(size);
         }
 
-        void pushBack(const Value& value)
+        void pushBack(const Value& value) &
         {
             if (type != Type::array) throw TypeError("Wrong type");
             arrayValue.push_back(value);
