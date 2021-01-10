@@ -345,16 +345,13 @@ namespace json
             static Iterator skipWhitespaces(Iterator begin, Iterator end)
             {
                 Iterator iterator = begin;
-                while (iterator != end)
-                {
-                    if (static_cast<char>(*iterator) != ' ' &&
-                        static_cast<char>(*iterator) != '\t' &&
-                        static_cast<char>(*iterator) != '\r' &&
-                        static_cast<char>(*iterator) != '\n')
-                        break;
-
+                while (iterator != end &&
+                       (static_cast<char>(*iterator) == ' ' ||
+                        static_cast<char>(*iterator) == '\t' ||
+                        static_cast<char>(*iterator) == '\r' ||
+                        static_cast<char>(*iterator) == '\n'))
                     ++iterator;
-                }
+
                 return iterator;
             }
 
