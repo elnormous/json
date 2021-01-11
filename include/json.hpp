@@ -342,14 +342,16 @@ namespace json
                 return true;
             }
 
+            static constexpr bool isWhitespace(const char c) noexcept
+            {
+                return c == ' ' || c == '\t' || c == '\r' || c == '\n';
+            }
+
             static Iterator skipWhitespaces(Iterator begin, Iterator end)
             {
                 Iterator iterator = begin;
                 while (iterator != end &&
-                       (static_cast<char>(*iterator) == ' ' ||
-                        static_cast<char>(*iterator) == '\t' ||
-                        static_cast<char>(*iterator) == '\r' ||
-                        static_cast<char>(*iterator) == '\n'))
+                       isWhitespace(static_cast<char>(*iterator)))
                     ++iterator;
 
                 return iterator;
