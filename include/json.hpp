@@ -349,7 +349,7 @@ namespace json
 
             static Iterator skipWhitespaces(Iterator begin, Iterator end)
             {
-                Iterator iterator = begin;
+                auto iterator = begin;
                 while (iterator != end &&
                        isWhitespace(static_cast<char>(*iterator)))
                     ++iterator;
