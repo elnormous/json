@@ -13,7 +13,7 @@ TEST_CASE("Null", "[null]")
 TEST_CASE("Integer", "[integer]")
 {
     const json::Value d = json::parse("10");
-    REQUIRE(d.getType() == json::Value::Type::integer);
+    REQUIRE(d.getType() == json::Value::Type::number);
     REQUIRE(d.as<int>() == 10);
 }
 
@@ -22,7 +22,7 @@ TEST_CASE("Float", "[float]")
     SECTION("Float")
     {
         const json::Value d = json::parse("0.5");
-        REQUIRE(d.getType() == json::Value::Type::floatingPoint);
+        REQUIRE(d.getType() == json::Value::Type::number);
         REQUIRE(d.as<float>() == Approx(0.5F));
     }
 
@@ -88,8 +88,8 @@ TEST_CASE("Array", "[array]")
     const json::Value d = json::parse("[1, 2\t , {}\n, \"\"]");
     REQUIRE(d.getType() == json::Value::Type::array);
     REQUIRE(d.as<json::Value::Array>().size() == 4);
-    REQUIRE(d[0].getType() == json::Value::Type::integer);
-    REQUIRE(d[1].getType() == json::Value::Type::integer);
+    REQUIRE(d[0].getType() == json::Value::Type::number);
+    REQUIRE(d[1].getType() == json::Value::Type::number);
     REQUIRE(d[0].as<int>() == 1);
     REQUIRE(d[1].as<int>() == 2);
     REQUIRE(d[2].getType() == json::Value::Type::object);
@@ -115,18 +115,18 @@ TEST_CASE("Encoding", "[encoding]")
     const json::Value d = json::Value::Object{
         {"n", nullptr},
         {"i", 1},
-        {"f", 2.0F},
+        {"f", 2.1F},
         {"s", "foo"},
         {"b", true},
         {"a", json::Value::Array{
-            true, 1, 2.0F, "3",
+            true, 1, 2.1F, "3",
             json::Value::Array{1, 2, 3}}
         }
     };
 
-    REQUIRE(json::encode(d) == "{\"a\":[true,1,2.000000,\"3\",[1,2,3]],\"b\":true,\"f\":2.000000,\"i\":1,\"n\":null,\"s\":\"foo\"}");
+    REQUIRE(json::encode(d) == "{\"a\":[true,1,2.100000,\"3\",[1,2,3]],\"b\":true,\"f\":2.100000,\"i\":1,\"n\":null,\"s\":\"foo\"}");
 
-    REQUIRE(json::encode(d, true) ==            "{\n\t\"a\":[\n\t\ttrue,\n\t\t1,\n\t\t2.000000,\n\t\t\"3\",\n\t\t[\n\t\t\t1,\n\t\t\t2,\n\t\t\t3\n\t\t]\n\t],\n\t\"b\":true,\n\t\"f\":2.000000,\n\t\"i\":1,\n\t\"n\":null,\n\t\"s\":\"foo\"\n}");
+    REQUIRE(json::encode(d, true) == "{\n\t\"a\":[\n\t\ttrue,\n\t\t1,\n\t\t2.100000,\n\t\t\"3\",\n\t\t[\n\t\t\t1,\n\t\t\t2,\n\t\t\t3\n\t\t]\n\t],\n\t\"b\":true,\n\t\"f\":2.100000,\n\t\"i\":1,\n\t\"n\":null,\n\t\"s\":\"foo\"\n}");
 }
 
 TEST_CASE("Byte", "[byte]")
@@ -194,14 +194,14 @@ TEST_CASE("Constructors")
     SECTION("Integer")
     {
         json::Value v = 10;
-        REQUIRE(v.getType() == json::Value::Type::integer);
+        REQUIRE(v.getType() == json::Value::Type::number);
         REQUIRE(v.as<int>() == 10);
     }
 
     SECTION("FloatingPoint")
     {
         json::Value v = 10.0;
-        REQUIRE(v.getType() == json::Value::Type::floatingPoint);
+        REQUIRE(v.getType() == json::Value::Type::number);
         REQUIRE(v.as<double>() == 10.0);
     }
 
@@ -248,7 +248,7 @@ TEST_CASE("Setters")
     {
         json::Value v;
         v = 10;
-        REQUIRE(v.getType() == json::Value::Type::integer);
+        REQUIRE(v.getType() == json::Value::Type::number);
         REQUIRE(v.as<int>() == 10);
     }
 
@@ -256,7 +256,7 @@ TEST_CASE("Setters")
     {
         json::Value v;
         v = 10.0;
-        REQUIRE(v.getType() == json::Value::Type::floatingPoint);
+        REQUIRE(v.getType() == json::Value::Type::number);
         REQUIRE(v.as<double>() == 10.0);
     }
 
