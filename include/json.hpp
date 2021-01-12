@@ -10,6 +10,7 @@
 #include <stdexcept>
 #include <string>
 #include <type_traits>
+#include <variant>
 #include <vector>
 
 namespace json
@@ -41,257 +42,339 @@ namespace json
         using Array = std::vector<Value>;
         using Object = std::map<std::string, Value>;
 
-        enum class Type
-        {
-            null,
-            number,
-            string,
-            object,
-            array,
-            boolean
-        };
-
         Value() = default;
 
-        Value(const Type initType): type(initType) {}
+        template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T> && !std::is_same_v<T, bool>>* = nullptr>
+        Value(const T v): value{static_cast<double>(v)} {}
+
+        Value(const std::string& v): value{v} {}
+
+        Value(const char* v): value{v} {}
+
+        Value(const bool v): value{v} {}
+
+        Value(const std::nullptr_t): value{nullptr} {}
+
+        Value(const Array& v): value(v) {}
+
+        Value(const Object& v): value{v} {}
 
         template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T> && !std::is_same_v<T, bool>>* = nullptr>
-        Value(const T value): type(Type::number), doubleValue(static_cast<double>(value)) {}
-
-        Value(const std::string& value): type(Type::string), stringValue(value) {}
-
-        Value(const char* value): type(Type::string), stringValue(value) {}
-
-        Value(const bool value): type(Type::boolean), boolValue(value) {}
-
-        Value(const std::nullptr_t): type(Type::null) {}
-
-        Value(const Array& value): type(Type::array), arrayValue(value) {}
-
-        Value(const Object& value): type(Type::object), objectValue(value) {}
-
-        Value& operator=(const Type newType) noexcept
+        Value& operator=(const T v) noexcept
         {
-            type = newType;
+            value = static_cast<double>(v);
             return *this;
         }
 
-        template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T> && !std::is_same_v<T, bool>>* = nullptr>
-        Value& operator=(const T value) noexcept
+        Value& operator=(const std::string& v)
         {
-            type = Type::number;
-            doubleValue = static_cast<double>(value);
+            value = v;
             return *this;
         }
 
-        Value& operator=(const std::string& value)
+        Value& operator=(const char* v)
         {
-            type = Type::string;
-            stringValue = value;
+            value = v;
             return *this;
         }
 
-        Value& operator=(const char* value)
+        Value& operator=(const bool v) noexcept
         {
-            type = Type::string;
-            stringValue = value;
-            return *this;
-        }
-
-        Value& operator=(const bool value) noexcept
-        {
-            type = Type::boolean;
-            boolValue = value;
+            value = v;
             return *this;
         }
 
         Value& operator=(std::nullptr_t) noexcept
         {
-            type = Type::null;
-            objectValue.clear();
             return *this;
         }
 
-        Value& operator=(const Array& value)
+        Value& operator=(const Array& v)
         {
-            type = Type::array;
-            arrayValue = value;
+            value = v;
             return *this;
         }
 
-        Value& operator=(const Object& value)
+        Value& operator=(const Object& v)
         {
-            type = Type::object;
-            objectValue = value;
+            value = v;
             return *this;
         }
-
-        Type getType() const noexcept { return type; }
 
         template <typename T, typename std::enable_if_t<std::is_same_v<T, std::string>>* = nullptr>
         std::string& as() noexcept
         {
-            type = Type::string;
-            return stringValue;
+            if (auto* result = std::get_if<std::string>(&value))
+                return *result;
+            else
+            {
+                value = std::string{};
+                return *std::get_if<std::string>(&value);
+            }
         }
 
         template <typename T, typename std::enable_if_t<std::is_same_v<T, std::string>>* = nullptr>
         const std::string& as() const
         {
-            if (type != Type::string) throw TypeError("Wrong type");
-            return stringValue;
+            if (auto* result = std::get_if<std::string>(&value))
+                return *result;
+            else
+                throw TypeError("Wrong type");
         }
 
         template <typename T, typename std::enable_if_t<std::is_same_v<T, const char*>>* = nullptr>
         T as() const
         {
-            if (type != Type::string) throw TypeError("Wrong type");
-            return stringValue.c_str();
+            if (auto* result = std::get_if<std::string>(&value))
+                return result->c_str();
+            else
+                throw TypeError("Wrong type");
+        }
+
+        template <typename T, typename std::enable_if_t<std::is_same_v<T, bool>>* = nullptr>
+        T as()
+        {
+            if (auto* result = std::get_if<bool>(&value))
+                return *result;
+            else
+            {
+                value = false;
+                return *std::get_if<bool>(&value);
+            }
         }
 
         template <typename T, typename std::enable_if_t<std::is_same_v<T, bool>>* = nullptr>
         T as() const
         {
-            if (type != Type::boolean && type != Type::number)
+            if (auto* result = std::get_if<bool>(&value))
+                return *result;
+            else
                 throw TypeError("Wrong type");
-            if (type == Type::boolean) return boolValue;
-            else return doubleValue != 0.0;
+        }
+
+        template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T> && !std::is_same_v<T, bool>>* = nullptr>
+        T as()
+        {
+            if (auto* result = std::get_if<double>(&value))
+                return static_cast<T>(*result);
+            else
+            {
+                value = 0.0;
+                return static_cast<T>(*std::get_if<double>(&value));
+            }
         }
 
         template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T> && !std::is_same_v<T, bool>>* = nullptr>
         T as() const
         {
-            if (type != Type::boolean && type != Type::number)
+            if (auto* result = std::get_if<double>(&value))
+                return static_cast<T>(*result);
+            else
                 throw TypeError("Wrong type");
-            if (type == Type::boolean) return boolValue;
-            else return static_cast<T>(doubleValue);
         }
 
         template <typename T, typename std::enable_if_t<std::is_same_v<T, Object>>* = nullptr>
         T& as() noexcept
         {
-            type = Type::object;
-            return objectValue;
+            if (auto* result = std::get_if<Object>(&value))
+                return *result;
+            else
+            {
+                value = Object{};
+                return *std::get_if<Object>(&value);
+            }
         }
 
         template <typename T, typename std::enable_if_t<std::is_same_v<T, Object>>* = nullptr>
         const T& as() const
         {
-            if (type != Type::object) throw TypeError("Wrong type");
-            return objectValue;
+            if (auto* result = std::get_if<Object>(&value))
+                return *result;
+            else
+                throw TypeError("Wrong type");
         }
 
         template <typename T, typename std::enable_if_t<std::is_same_v<T, Array>>* = nullptr>
         T& as() noexcept
         {
-            type = Type::array;
-            return arrayValue;
+            if (auto* result = std::get_if<Array>(&value))
+                return *result;
+            else
+            {
+                value = Array{};
+                return *std::get_if<Array>(&value);
+            }
         }
 
         template <typename T, typename std::enable_if_t<std::is_same_v<T, Array>>* = nullptr>
         const T& as() const
         {
-            if (type != Type::array) throw TypeError("Wrong type");
-            return arrayValue;
+            if (auto* result = std::get_if<Array>(&value))
+                return *result;
+            else
+                throw TypeError("Wrong type");
         }
 
         Array::iterator begin()
         {
-            if (type != Type::array) throw TypeError("Wrong type");
-            return arrayValue.begin();
+            if (auto* result = std::get_if<Array>(&value))
+                return result->begin();
+            else
+                throw TypeError("Wrong type");
         }
 
         Array::iterator end()
         {
-            if (type != Type::array) throw TypeError("Wrong type");
-            return arrayValue.end();
+            if (auto* result = std::get_if<Array>(&value))
+                return result->end();
+            else
+                throw TypeError("Wrong type");
         }
 
         Array::const_iterator begin() const
         {
-            if (type != Type::array) throw TypeError("Wrong type");
-            return arrayValue.begin();
+            if (auto* result = std::get_if<Array>(&value))
+                return result->begin();
+            else
+                throw TypeError("Wrong type");
         }
 
         Array::const_iterator end() const
         {
-            if (type != Type::array) throw TypeError("Wrong type");
-            return arrayValue.end();
+            if (auto* result = std::get_if<Array>(&value))
+                return result->end();
+            else
+                throw TypeError("Wrong type");
         }
 
-        bool isNull() const noexcept
+        template <typename T, typename std::enable_if_t<std::is_same_v<T, std::nullptr_t>>* = nullptr>
+        bool is() const noexcept
         {
-            return type == Type::null;
+            return std::holds_alternative<std::nullptr_t>(value);
+        }
+
+        template <typename T, typename std::enable_if_t<std::is_same_v<T, std::string>>* = nullptr>
+        bool is() const noexcept
+        {
+            return std::holds_alternative<std::string>(value);
+        }
+
+        template <typename T, typename std::enable_if_t<std::is_same_v<T, const char*>>* = nullptr>
+        bool is() const noexcept
+        {
+            return std::holds_alternative<std::string>(value);
+        }
+
+        template <typename T, typename std::enable_if_t<std::is_same_v<T, bool>>* = nullptr>
+        bool is() const noexcept
+        {
+            return std::holds_alternative<bool>(value);
+        }
+
+        template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T> && !std::is_same_v<T, bool>>* = nullptr>
+        bool is() const noexcept
+        {
+            return std::holds_alternative<double>(value);
+        }
+
+        template <typename T, typename std::enable_if_t<std::is_same_v<T, Object>>* = nullptr>
+        bool is() const noexcept
+        {
+            return std::holds_alternative<Object>(value);
+        }
+
+        template <typename T, typename std::enable_if_t<std::is_same_v<T, Array>>* = nullptr>
+        bool is() const noexcept
+        {
+            return std::holds_alternative<Array>(value);
         }
 
         bool hasMember(const std::string& member) const
         {
-            if (type != Type::object) throw TypeError("Wrong type");
-            return objectValue.find(member) != objectValue.end();
+            if (auto* object = std::get_if<Object>(&value))
+                return object->find(member) != object->end();
+            else
+                throw TypeError("Wrong type");
         }
 
         Value& operator[](const std::string& member) &
         {
-            type = Type::object;
-            return objectValue[member];
+            if (auto* object = std::get_if<Object>(&value))
+                return (*object)[member];
+            else
+            {
+                value = Object{};
+                return (*std::get_if<Object>(&value))[member];
+            }
         }
 
         const Value& operator[](const std::string& member) const&
         {
-            if (type != Type::object) throw TypeError("Wrong type");
-
-            auto i = objectValue.find(member);
-            if (i != objectValue.end())
-                return i->second;
+            if (auto* object = std::get_if<Object>(&value))
+            {
+                auto i = object->find(member);
+                if (i != object->end())
+                    return i->second;
+                else
+                    throw RangeError("Member does not exist");
+            }
             else
-                throw RangeError("Member does not exist");
+                throw TypeError("Wrong type");
         }
 
         Value& operator[](std::size_t index) &
         {
-            type = Type::array;
-            if (index >= arrayValue.size()) arrayValue.resize(index + 1);
-            return arrayValue[index];
+            if (auto* array = std::get_if<Array>(&value))
+            {
+                if (index >= array->size()) array->resize(index + 1);
+                return (*array)[index];
+            }
+            else
+            {
+                value = Array(index + 1);
+                return (*std::get_if<Array>(&value))[index];
+            }
         }
 
         const Value& operator[](std::size_t index) const&
         {
-            if (type != Type::array) throw TypeError("Wrong type");
-
-            if (index < arrayValue.size())
-                return arrayValue[index];
+            if (auto* array = std::get_if<Array>(&value))
+            {
+                if (index < array->size())
+                    return (*array)[index];
+                else
+                    throw RangeError("Index out of range");
+            }
             else
-                throw RangeError("Index out of range");
+                throw TypeError("Wrong type");
         }
 
         std::size_t getSize() const
         {
-            if (type != Type::array) throw TypeError("Wrong type");
-            return arrayValue.size();
+            if (auto* array = std::get_if<Array>(&value))
+                return array->size();
+            else
+                throw TypeError("Wrong type");
         }
 
         void resize(std::size_t size) &
         {
-            if (type != Type::array) throw TypeError("Wrong type");
-            arrayValue.resize(size);
+            if (auto* array = std::get_if<Array>(&value))
+                array->resize(size);
+            else
+                throw TypeError("Wrong type");
         }
 
-        void pushBack(const Value& value) &
+        void pushBack(const Value& v) &
         {
-            if (type != Type::array) throw TypeError("Wrong type");
-            arrayValue.push_back(value);
+            if (auto* array = std::get_if<Array>(&value))
+                array->push_back(v);
+            else
+                throw TypeError("Wrong type");
         }
 
     private:
-        Type type = Type::object;
-        union
-        {
-            bool boolValue = false;
-            double doubleValue;
-        };
-        Object objectValue;
-        Array arrayValue;
-        std::string stringValue;
+        std::variant<std::nullptr_t, bool, double, Object, Array, std::string> value;
     };
 
     inline namespace detail
@@ -367,7 +450,7 @@ namespace json
                 {
                     ++iterator;
 
-                    Value result = Value::Type::object;
+                    Value result = Value::Object{};
 
                     bool firstValue = true;
 
@@ -408,7 +491,7 @@ namespace json
                 {
                     ++iterator;
 
-                    Value result = Value::Type::array;
+                    Value result = Value::Array{};
 
                     bool firstValue = true;
 
@@ -691,75 +774,68 @@ namespace json
 
             static void encode(const Value& value, std::string& result, bool whitespaces, size_t level = 0)
             {
-                switch (value.getType())
+                if (value.is<std::nullptr_t>())
+                    result.insert(result.end(), {'n', 'u', 'l', 'l'});
+                else if (value.is<double>())
                 {
-                    case Value::Type::null:
-                    {
-                        result.insert(result.end(), {'n', 'u', 'l', 'l'});
-                        break;
-                    }
-                    case Value::Type::number:
-                    {
-                        const auto d = value.as<double>();
-                        const auto str = (std::floor(d) == d) ? std::to_string(static_cast<std::int64_t>(d)) : std::to_string(d);
-                        result.insert(result.end(), str.begin(), str.end());
-                        break;
-                    }
-                    case Value::Type::string:
-                        result.push_back('"');
-                        encode(value.as<std::string>(), result);
-                        result.push_back('"');
-                        break;
-                    case Value::Type::object:
-                    {
-                        result.push_back('{');
-                        if (whitespaces) result.push_back('\n');
-
-                        const auto& entries = value.as<Value::Object>();
-
-                        for (auto entryIterator = entries.begin(); entryIterator != entries.end();)
-                        {
-                            const auto& entry = *entryIterator;
-                            if (whitespaces) result.insert(result.end(), level + 1, '\t');
-                            result.push_back('"');
-                            encode(entry.first, result);
-                            result.insert(result.end(), {'"', ':'});
-                            encode(entry.second, result, whitespaces, level + 1);
-                            if (++entryIterator != entries.end()) result.push_back(',');
-                            if (whitespaces) result.push_back('\n');
-                        }
-
-                        if (whitespaces) result.insert(result.end(), level, '\t');
-                        result.push_back('}');
-                        break;
-                    }
-                    case Value::Type::array:
-                    {
-                        result.push_back('[');
-                        if (whitespaces) result.push_back('\n');
-
-                        const auto& entries = value.as<Value::Array>();
-
-                        for (auto entryIterator = entries.begin(); entryIterator != entries.end();)
-                        {
-                            const auto& entry = *entryIterator;
-                            if (whitespaces) result.insert(result.end(), level + 1, '\t');
-                            encode(entry, result, whitespaces, level + 1);
-                            if (++entryIterator != entries.end()) result.push_back(',');
-                            if (whitespaces) result.push_back('\n');
-                        }
-
-                        if (whitespaces) result.insert(result.end(), level, '\t');
-                        result.push_back(']');
-                        break;
-                    }
-                    case Value::Type::boolean:
-                        if (value.as<bool>()) result.insert(result.end(), {'t', 'r', 'u', 'e'});
-                        else result.insert(result.end(), {'f', 'a', 'l', 's', 'e'});
-                        break;
-                    default:
-                        throw ParseError("Unknown value type");
+                    const auto d = value.as<double>();
+                    const auto str = (std::floor(d) == d) ? std::to_string(static_cast<std::int64_t>(d)) : std::to_string(d);
+                    result.insert(result.end(), str.begin(), str.end());
                 }
+                else if (value.is<std::string>())
+                {
+                    result.push_back('"');
+                    encode(value.as<std::string>(), result);
+                    result.push_back('"');
+                }
+                else if (value.is<Value::Object>())
+                {
+                    result.push_back('{');
+                    if (whitespaces) result.push_back('\n');
+
+                    const auto& entries = value.as<Value::Object>();
+
+                    for (auto entryIterator = entries.begin(); entryIterator != entries.end();)
+                    {
+                        const auto& entry = *entryIterator;
+                        if (whitespaces) result.insert(result.end(), level + 1, '\t');
+                        result.push_back('"');
+                        encode(entry.first, result);
+                        result.insert(result.end(), {'"', ':'});
+                        encode(entry.second, result, whitespaces, level + 1);
+                        if (++entryIterator != entries.end()) result.push_back(',');
+                        if (whitespaces) result.push_back('\n');
+                    }
+
+                    if (whitespaces) result.insert(result.end(), level, '\t');
+                    result.push_back('}');
+                }
+                else if (value.is<Value::Array>())
+                {
+                    result.push_back('[');
+                    if (whitespaces) result.push_back('\n');
+
+                    const auto& entries = value.as<Value::Array>();
+
+                    for (auto entryIterator = entries.begin(); entryIterator != entries.end();)
+                    {
+                        const auto& entry = *entryIterator;
+                        if (whitespaces) result.insert(result.end(), level + 1, '\t');
+                        encode(entry, result, whitespaces, level + 1);
+                        if (++entryIterator != entries.end()) result.push_back(',');
+                        if (whitespaces) result.push_back('\n');
+                    }
+
+                    if (whitespaces) result.insert(result.end(), level, '\t');
+                    result.push_back(']');
+                }
+                else if (value.is<bool>())
+                {
+                    if (value.as<bool>()) result.insert(result.end(), {'t', 'r', 'u', 'e'});
+                    else result.insert(result.end(), {'f', 'a', 'l', 's', 'e'});
+                }
+                else
+                    throw ParseError("Unknown value type");
             }
         };
 
