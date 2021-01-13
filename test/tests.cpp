@@ -284,6 +284,16 @@ TEST_CASE("Setters")
         REQUIRE(v.as<json::Value::Array>().empty());
     }
 
+    SECTION("Array push back")
+    {
+        json::Value v;
+        v = json::Value::Array{};
+        v.pushBack(10);
+        REQUIRE(!v.as<json::Value::Array>().empty());
+        REQUIRE(v.getSize() == 1);
+        REQUIRE(v[0].getType() == json::Value::Type::number);
+    }
+
     SECTION("Boolean")
     {
         json::Value v;
