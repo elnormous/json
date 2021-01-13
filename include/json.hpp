@@ -56,20 +56,20 @@ namespace json
 
         Value(const Type initType): type(initType) {}
 
-        template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T> && !std::is_same_v<T, bool>>* = nullptr>
-        Value(const T value): type(Type::number), numberValue(static_cast<double>(value)) {}
-
-        Value(const String& value): type(Type::string), stringValue(value) {}
-
-        Value(const char* value): type(Type::string), stringValue(value) {}
+        Value(const std::nullptr_t): type(Type::null) {}
 
         Value(const bool value): type(Type::boolean), boolValue(value) {}
 
-        Value(const std::nullptr_t): type(Type::null) {}
+        template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T> && !std::is_same_v<T, bool>>* = nullptr>
+        Value(const T value): type(Type::number), numberValue(static_cast<double>(value)) {}
 
         Value(const Array& value): type(Type::array), arrayValue(value) {}
 
         Value(const Object& value): type(Type::object), objectValue(value) {}
+
+        Value(const String& value): type(Type::string), stringValue(value) {}
+
+        Value(const char* value): type(Type::string), stringValue(value) {}
 
         Value& operator=(const Type newType) noexcept
         {
@@ -77,25 +77,10 @@ namespace json
             return *this;
         }
 
-        template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T> && !std::is_same_v<T, bool>>* = nullptr>
-        Value& operator=(const T value) noexcept
+        Value& operator=(std::nullptr_t) noexcept
         {
-            type = Type::number;
-            numberValue = static_cast<double>(value);
-            return *this;
-        }
-
-        Value& operator=(const String& value)
-        {
-            type = Type::string;
-            stringValue = value;
-            return *this;
-        }
-
-        Value& operator=(const char* value)
-        {
-            type = Type::string;
-            stringValue = value;
+            type = Type::null;
+            objectValue.clear();
             return *this;
         }
 
@@ -106,10 +91,11 @@ namespace json
             return *this;
         }
 
-        Value& operator=(std::nullptr_t) noexcept
+        template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T> && !std::is_same_v<T, bool>>* = nullptr>
+        Value& operator=(const T value) noexcept
         {
-            type = Type::null;
-            objectValue.clear();
+            type = Type::number;
+            numberValue = static_cast<double>(value);
             return *this;
         }
 
@@ -127,7 +113,67 @@ namespace json
             return *this;
         }
 
+        Value& operator=(const String& value)
+        {
+            type = Type::string;
+            stringValue = value;
+            return *this;
+        }
+
+        Value& operator=(const char* value)
+        {
+            type = Type::string;
+            stringValue = value;
+            return *this;
+        }
+
         Type getType() const noexcept { return type; }
+
+        template <typename T, typename std::enable_if_t<std::is_same_v<T, bool>>* = nullptr>
+        T as() const
+        {
+            if (type != Type::boolean && type != Type::number)
+                throw TypeError("Wrong type");
+            if (type == Type::boolean) return boolValue;
+            else return numberValue != 0.0;
+        }
+
+        template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T> && !std::is_same_v<T, bool>>* = nullptr>
+        T as() const
+        {
+            if (type != Type::boolean && type != Type::number)
+                throw TypeError("Wrong type");
+            if (type == Type::boolean) return boolValue;
+            else return static_cast<T>(numberValue);
+        }
+
+        template <typename T, typename std::enable_if_t<std::is_same_v<T, Array>>* = nullptr>
+        T& as() noexcept
+        {
+            type = Type::array;
+            return arrayValue;
+        }
+
+        template <typename T, typename std::enable_if_t<std::is_same_v<T, Array>>* = nullptr>
+        const T& as() const
+        {
+            if (type != Type::array) throw TypeError("Wrong type");
+            return arrayValue;
+        }
+
+        template <typename T, typename std::enable_if_t<std::is_same_v<T, Object>>* = nullptr>
+        T& as() noexcept
+        {
+            type = Type::object;
+            return objectValue;
+        }
+
+        template <typename T, typename std::enable_if_t<std::is_same_v<T, Object>>* = nullptr>
+        const T& as() const
+        {
+            if (type != Type::object) throw TypeError("Wrong type");
+            return objectValue;
+        }
 
         template <typename T, typename std::enable_if_t<std::is_same_v<T, String>>* = nullptr>
         String& as() noexcept
@@ -148,52 +194,6 @@ namespace json
         {
             if (type != Type::string) throw TypeError("Wrong type");
             return stringValue.c_str();
-        }
-
-        template <typename T, typename std::enable_if_t<std::is_same_v<T, bool>>* = nullptr>
-        T as() const
-        {
-            if (type != Type::boolean && type != Type::number)
-                throw TypeError("Wrong type");
-            if (type == Type::boolean) return boolValue;
-            else return numberValue != 0.0;
-        }
-
-        template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T> && !std::is_same_v<T, bool>>* = nullptr>
-        T as() const
-        {
-            if (type != Type::boolean && type != Type::number)
-                throw TypeError("Wrong type");
-            if (type == Type::boolean) return boolValue;
-            else return static_cast<T>(numberValue);
-        }
-
-        template <typename T, typename std::enable_if_t<std::is_same_v<T, Object>>* = nullptr>
-        T& as() noexcept
-        {
-            type = Type::object;
-            return objectValue;
-        }
-
-        template <typename T, typename std::enable_if_t<std::is_same_v<T, Object>>* = nullptr>
-        const T& as() const
-        {
-            if (type != Type::object) throw TypeError("Wrong type");
-            return objectValue;
-        }
-
-        template <typename T, typename std::enable_if_t<std::is_same_v<T, Array>>* = nullptr>
-        T& as() noexcept
-        {
-            type = Type::array;
-            return arrayValue;
-        }
-
-        template <typename T, typename std::enable_if_t<std::is_same_v<T, Array>>* = nullptr>
-        const T& as() const
-        {
-            if (type != Type::array) throw TypeError("Wrong type");
-            return arrayValue;
         }
 
         Array::iterator begin()
