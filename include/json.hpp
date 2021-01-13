@@ -40,6 +40,7 @@ namespace json
     public:
         using Array = std::vector<Value>;
         using Object = std::map<std::string, Value>;
+        using String = std::string;
 
         enum class Type
         {
@@ -58,7 +59,7 @@ namespace json
         template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T> && !std::is_same_v<T, bool>>* = nullptr>
         Value(const T value): type(Type::number), doubleValue(static_cast<double>(value)) {}
 
-        Value(const std::string& value): type(Type::string), stringValue(value) {}
+        Value(const String& value): type(Type::string), stringValue(value) {}
 
         Value(const char* value): type(Type::string), stringValue(value) {}
 
@@ -84,7 +85,7 @@ namespace json
             return *this;
         }
 
-        Value& operator=(const std::string& value)
+        Value& operator=(const String& value)
         {
             type = Type::string;
             stringValue = value;
@@ -128,15 +129,15 @@ namespace json
 
         Type getType() const noexcept { return type; }
 
-        template <typename T, typename std::enable_if_t<std::is_same_v<T, std::string>>* = nullptr>
-        std::string& as() noexcept
+        template <typename T, typename std::enable_if_t<std::is_same_v<T, String>>* = nullptr>
+        String& as() noexcept
         {
             type = Type::string;
             return stringValue;
         }
 
-        template <typename T, typename std::enable_if_t<std::is_same_v<T, std::string>>* = nullptr>
-        const std::string& as() const
+        template <typename T, typename std::enable_if_t<std::is_same_v<T, String>>* = nullptr>
+        const String& as() const
         {
             if (type != Type::string) throw TypeError("Wrong type");
             return stringValue;
@@ -291,7 +292,7 @@ namespace json
         };
         Object objectValue;
         Array arrayValue;
-        std::string stringValue;
+        String stringValue;
     };
 
     inline namespace detail
