@@ -45,11 +45,11 @@ namespace json
         enum class Type
         {
             null,
+            boolean,
             number,
             string,
             object,
-            array,
-            boolean
+            array
         };
 
         Value() = default;
@@ -57,7 +57,7 @@ namespace json
         Value(const Type initType): type(initType) {}
 
         template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T> && !std::is_same_v<T, bool>>* = nullptr>
-        Value(const T value): type(Type::number), doubleValue(static_cast<double>(value)) {}
+        Value(const T value): type(Type::number), numberValue(static_cast<double>(value)) {}
 
         Value(const String& value): type(Type::string), stringValue(value) {}
 
@@ -81,7 +81,7 @@ namespace json
         Value& operator=(const T value) noexcept
         {
             type = Type::number;
-            doubleValue = static_cast<double>(value);
+            numberValue = static_cast<double>(value);
             return *this;
         }
 
@@ -156,7 +156,7 @@ namespace json
             if (type != Type::boolean && type != Type::number)
                 throw TypeError("Wrong type");
             if (type == Type::boolean) return boolValue;
-            else return doubleValue != 0.0;
+            else return numberValue != 0.0;
         }
 
         template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T> && !std::is_same_v<T, bool>>* = nullptr>
@@ -165,7 +165,7 @@ namespace json
             if (type != Type::boolean && type != Type::number)
                 throw TypeError("Wrong type");
             if (type == Type::boolean) return boolValue;
-            else return static_cast<T>(doubleValue);
+            else return static_cast<T>(numberValue);
         }
 
         template <typename T, typename std::enable_if_t<std::is_same_v<T, Object>>* = nullptr>
@@ -288,7 +288,7 @@ namespace json
         union
         {
             bool boolValue = false;
-            double doubleValue;
+            double numberValue;
         };
         Object objectValue;
         Array arrayValue;
