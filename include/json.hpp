@@ -265,6 +265,12 @@ namespace json
                 throw RangeError("Index out of range");
         }
 
+        bool isEmpty() const
+        {
+            if (type != Type::array) throw TypeError("Wrong type");
+            return arrayValue.empty();
+        }
+
         std::size_t getSize() const
         {
             if (type != Type::array) throw TypeError("Wrong type");

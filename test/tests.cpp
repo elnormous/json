@@ -289,7 +289,7 @@ TEST_CASE("Setters")
         json::Value v;
         v = json::Value::Array{};
         v.pushBack(10);
-        REQUIRE(!v.as<json::Value::Array>().empty());
+        REQUIRE(!v.isEmpty());
         REQUIRE(v.getSize() == 1);
         REQUIRE(v[0].getType() == json::Value::Type::number);
     }
