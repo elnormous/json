@@ -4,6 +4,7 @@
 #define JSON_HPP
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <cstdint>
 #include <map>
@@ -303,7 +304,7 @@ namespace json
 
     inline namespace detail
     {
-        constexpr std::uint8_t utf8ByteOrderMark[] = {0xEF, 0xBB, 0xBF};
+        constexpr std::array<std::uint8_t, 3> utf8ByteOrderMark{0xEF, 0xBB, 0xBF};
     }
 
     template <class Iterator>
@@ -523,9 +524,9 @@ namespace json
                 }
                 else
                 {
-                    constexpr char trueString[] = {'t', 'r', 'u', 'e'};
-                    constexpr char falseString[] = {'f', 'a', 'l', 's', 'e'};
-                    constexpr char nullString[] = {'n', 'u', 'l', 'l'};
+                    constexpr std::array trueString{'t', 'r', 'u', 'e'};
+                    constexpr std::array falseString{'f', 'a', 'l', 's', 'e'};
+                    constexpr std::array nullString{'n', 'u', 'l', 'l'};
 
                     auto [isTrue, trueIterator] = isSame(iterator, end, std::begin(trueString), std::end(trueString));
                     iterator = trueIterator;
@@ -688,7 +689,10 @@ namespace json
                     {
                         result.insert(result.end(), {'\\', 'u'});
 
-                        constexpr char digits[] = "0123456789abcdef";
+                        constexpr std::array digits{
+                            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                            'a', 'b', 'c', 'd', 'e', 'f'
+                        };
                         for (std::uint32_t p = 0; p < 4; ++p)
                             result.push_back(digits[(c >> (12 - p * 4)) & 0x0F]);
                     }
