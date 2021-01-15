@@ -55,22 +55,22 @@ namespace json
 
         Value() = default;
 
-        Value(const Type initType): type(initType) {}
+        Value(const Type initType): type{initType} {}
 
-        Value(const std::nullptr_t): type(Type::null) {}
+        Value(const std::nullptr_t): type{Type::null} {}
 
-        Value(const bool value): type(Type::boolean), boolValue(value) {}
+        Value(const bool value): type{Type::boolean}, boolValue{value} {}
 
         template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T> && !std::is_same_v<T, bool>>* = nullptr>
-        Value(const T value): type(Type::number), numberValue(static_cast<double>(value)) {}
+        Value(const T value): type{Type::number}, numberValue{static_cast<double>(value)} {}
 
-        Value(const Array& value): type(Type::array), arrayValue(value) {}
+        Value(const Array& value): type{Type::array}, arrayValue{value} {}
 
-        Value(const Object& value): type(Type::object), objectValue(value) {}
+        Value(const Object& value): type{Type::object}, objectValue{value} {}
 
-        Value(const String& value): type(Type::string), stringValue(value) {}
+        Value(const String& value): type{Type::string}, stringValue{value} {}
 
-        Value(const char* value): type(Type::string), stringValue(value) {}
+        Value(const char* value): type{Type::string}, stringValue{value} {}
 
         Value& operator=(const Type newType) noexcept
         {
