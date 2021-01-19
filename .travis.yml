@@ -16,7 +16,7 @@ addons:
 before_script:
   - export CXX=g++-7
 script:
-  - build-wrapper-linux-x86-64 --out-dir bw-output make DEBUG=1 -C test
+  - build-wrapper-linux-x86-64 --out-dir bw-output make -C test
   - test/test
   - (cd test && gcov main.cpp tests.cpp)
   - sonar-scanner
