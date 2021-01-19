@@ -186,49 +186,49 @@ TEST_CASE("Constructors")
 {
     SECTION("Null")
     {
-        json::Value v = nullptr;
+        const json::Value v = nullptr;
         REQUIRE(v.getType() == json::Value::Type::null);
         REQUIRE(v.isNull());
     }
 
     SECTION("Integer")
     {
-        json::Value v = 10;
+        const json::Value v = 10;
         REQUIRE(v.getType() == json::Value::Type::number);
         REQUIRE(v.as<int>() == 10);
     }
 
     SECTION("FloatingPoint")
     {
-        json::Value v = 10.0;
+        const json::Value v = 10.0;
         REQUIRE(v.getType() == json::Value::Type::number);
         REQUIRE(v.as<double>() == 10.0);
     }
 
     SECTION("String")
     {
-        json::Value v = "s";
+        const json::Value v = "s";
         REQUIRE(v.getType() == json::Value::Type::string);
         REQUIRE(v.as<std::string>() == "s");
     }
 
     SECTION("Object")
     {
-        json::Value v = json::Value::Object{};
+        const  json::Value v = json::Value::Object{};
         REQUIRE(v.getType() == json::Value::Type::object);
         REQUIRE(v.as<json::Value::Object>().empty());
     }
 
     SECTION("Array")
     {
-        json::Value v = json::Value::Array{};
+        const json::Value v = json::Value::Array{};
         REQUIRE(v.getType() == json::Value::Type::array);
         REQUIRE(v.as<json::Value::Array>().empty());
     }
 
     SECTION("Boolean")
     {
-        json::Value v = false;
+        const json::Value v = false;
         REQUIRE(v.getType() == json::Value::Type::boolean);
         REQUIRE_FALSE(v.as<bool>());
     }
@@ -307,25 +307,25 @@ TEST_CASE("BoolCast")
 {
     SECTION("ZeroFloat")
     {
-        json::Value v = 0.0;
+        const json::Value v = 0.0;
         REQUIRE_FALSE(v.as<bool>());
     }
 
     SECTION("PositiveFloat")
     {
-        json::Value v = 1.0;
+        const json::Value v = 1.0;
         REQUIRE(v.as<bool>());
     }
 
     SECTION("ZeroInteger")
     {
-        json::Value v = 0;
+        const json::Value v = 0;
         REQUIRE_FALSE(v.as<bool>());
     }
 
     SECTION("PositiveInteger")
     {
-        json::Value v = 1;
+        const json::Value v = 1;
         REQUIRE(v.as<bool>());
     }
 }
