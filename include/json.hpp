@@ -348,7 +348,8 @@ namespace json
             }
 
             static std::pair<bool, Iterator> isSame(Iterator begin, Iterator end,
-                                                    const char* expectedBegin, const char* expectedEnd)
+                                                    const char* expectedBegin,
+                                                    const char* expectedEnd)
             {
                 auto iterator = begin;
 
@@ -528,17 +529,23 @@ namespace json
                     constexpr std::array falseString{'f', 'a', 'l', 's', 'e'};
                     constexpr std::array nullString{'n', 'u', 'l', 'l'};
 
-                    const auto [isTrue, trueIterator] = isSame(iterator, end, std::begin(trueString), std::end(trueString));
+                    const auto [isTrue, trueIterator] = isSame(iterator, end,
+                                                               std::begin(trueString),
+                                                               std::end(trueString));
                     iterator = trueIterator;
                     if (isTrue)
                         return std::pair(Value{true}, iterator);
 
-                    const auto [isFalse, falseIterator] = isSame(iterator, end, std::begin(falseString), std::end(falseString));
+                    const auto [isFalse, falseIterator] = isSame(iterator, end,
+                                                                 std::begin(falseString),
+                                                                 std::end(falseString));
                     iterator = falseIterator;
                     if (isFalse)
                         return std::pair(Value{false}, iterator);
 
-                    const auto [isNull, nullIterator] = isSame(iterator, end, std::begin(nullString), std::end(nullString));
+                    const auto [isNull, nullIterator] = isSame(iterator, end,
+                                                               std::begin(nullString),
+                                                               std::end(nullString));
                     iterator = nullIterator;
                     if (isNull)
                         return std::pair(Value{nullptr}, iterator);
