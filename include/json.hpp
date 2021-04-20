@@ -131,7 +131,7 @@ namespace json
         T as() const
         {
             if (type != Type::boolean && type != Type::number)
-                throw TypeError("Wrong type");
+                throw TypeError{"Wrong type"};
             if (type == Type::boolean) return boolValue;
             else return numberValue != 0.0;
         }
@@ -140,7 +140,7 @@ namespace json
         T as() const
         {
             if (type != Type::boolean && type != Type::number)
-                throw TypeError("Wrong type");
+                throw TypeError{"Wrong type"};
             if (type == Type::boolean) return boolValue;
             else return static_cast<T>(numberValue);
         }
@@ -155,7 +155,7 @@ namespace json
         template <typename T, typename std::enable_if_t<std::is_same_v<T, Array>>* = nullptr>
         const T& as() const
         {
-            if (type != Type::array) throw TypeError("Wrong type");
+            if (type != Type::array) throw TypeError{"Wrong type"};
             return arrayValue;
         }
 
@@ -169,7 +169,7 @@ namespace json
         template <typename T, typename std::enable_if_t<std::is_same_v<T, Object>>* = nullptr>
         const T& as() const
         {
-            if (type != Type::object) throw TypeError("Wrong type");
+            if (type != Type::object) throw TypeError{"Wrong type"};
             return objectValue;
         }
 
@@ -183,38 +183,38 @@ namespace json
         template <typename T, typename std::enable_if_t<std::is_same_v<T, String>>* = nullptr>
         const String& as() const
         {
-            if (type != Type::string) throw TypeError("Wrong type");
+            if (type != Type::string) throw TypeError{"Wrong type"};
             return stringValue;
         }
 
         template <typename T, typename std::enable_if_t<std::is_same_v<T, const char*>>* = nullptr>
         T as() const
         {
-            if (type != Type::string) throw TypeError("Wrong type");
+            if (type != Type::string) throw TypeError{"Wrong type"};
             return stringValue.c_str();
         }
 
         Array::iterator begin()
         {
-            if (type != Type::array) throw TypeError("Wrong type");
+            if (type != Type::array) throw TypeError{"Wrong type"};
             return arrayValue.begin();
         }
 
         Array::iterator end()
         {
-            if (type != Type::array) throw TypeError("Wrong type");
+            if (type != Type::array) throw TypeError{"Wrong type"};
             return arrayValue.end();
         }
 
         Array::const_iterator begin() const
         {
-            if (type != Type::array) throw TypeError("Wrong type");
+            if (type != Type::array) throw TypeError{"Wrong type"};
             return arrayValue.begin();
         }
 
         Array::const_iterator end() const
         {
-            if (type != Type::array) throw TypeError("Wrong type");
+            if (type != Type::array) throw TypeError{"Wrong type"};
             return arrayValue.end();
         }
 
@@ -225,7 +225,7 @@ namespace json
 
         bool hasMember(const std::string& member) const
         {
-            if (type != Type::object) throw TypeError("Wrong type");
+            if (type != Type::object) throw TypeError{"Wrong type"};
             return objectValue.find(member) != objectValue.end();
         }
 
@@ -237,13 +237,13 @@ namespace json
 
         const Value& operator[](const std::string& member) const&
         {
-            if (type != Type::object) throw TypeError("Wrong type");
+            if (type != Type::object) throw TypeError{"Wrong type"};
 
             auto i = objectValue.find(member);
             if (i != objectValue.end())
                 return i->second;
             else
-                throw RangeError("Member does not exist");
+                throw RangeError{"Member does not exist"};
         }
 
         Value& operator[](std::size_t index) &
@@ -255,35 +255,35 @@ namespace json
 
         const Value& operator[](std::size_t index) const&
         {
-            if (type != Type::array) throw TypeError("Wrong type");
+            if (type != Type::array) throw TypeError{"Wrong type"};
 
             if (index < arrayValue.size())
                 return arrayValue[index];
             else
-                throw RangeError("Index out of range");
+                throw RangeError{"Index out of range"};
         }
 
         bool isEmpty() const
         {
-            if (type != Type::array) throw TypeError("Wrong type");
+            if (type != Type::array) throw TypeError{"Wrong type"};
             return arrayValue.empty();
         }
 
         std::size_t getSize() const
         {
-            if (type != Type::array) throw TypeError("Wrong type");
+            if (type != Type::array) throw TypeError{"Wrong type"};
             return arrayValue.size();
         }
 
         void resize(std::size_t size) &
         {
-            if (type != Type::array) throw TypeError("Wrong type");
+            if (type != Type::array) throw TypeError{"Wrong type"};
             arrayValue.resize(size);
         }
 
         void pushBack(const Value& value) &
         {
-            if (type != Type::array) throw TypeError("Wrong type");
+            if (type != Type::array) throw TypeError{"Wrong type"};
             arrayValue.push_back(value);
         }
 
@@ -315,7 +315,7 @@ namespace json
                 const auto startIterator = hasByteOrderMark(begin, end) ? begin + 3 : begin;
                 const auto [result, valueIterator] = parseValue(startIterator, end);
                 if (const auto endIterator = skipWhitespaces(valueIterator, end); endIterator != end)
-                    throw ParseError("Unexpected data");
+                    throw ParseError{"Unexpected data"};
 
                 return result;
             }
@@ -366,7 +366,7 @@ namespace json
                 Iterator iterator = skipWhitespaces(begin, end);
 
                 if (iterator == end)
-                    throw ParseError("Unexpected end of data");
+                    throw ParseError{"Unexpected end of data"};
 
                 if (static_cast<char>(*iterator) == '{')
                 {
@@ -384,7 +384,7 @@ namespace json
                         else
                         {
                             if (static_cast<char>(*iterator++) != ',')
-                                throw ParseError("Invalid object");
+                                throw ParseError{"Invalid object"};
 
                             iterator = skipWhitespaces(iterator, end);
                         }
@@ -393,7 +393,7 @@ namespace json
                         iterator = skipWhitespaces(stringIterator, end);
 
                         if (static_cast<char>(*iterator++) != ':')
-                            throw ParseError("Invalid object");
+                            throw ParseError{"Invalid object"};
 
                         iterator = skipWhitespaces(iterator, end);
 
@@ -403,7 +403,7 @@ namespace json
                     }
 
                     if (iterator == end || static_cast<char>(*iterator) != '}')
-                        throw ParseError("Invalid object");
+                        throw ParseError{"Invalid object"};
 
                     ++iterator;
 
@@ -425,7 +425,7 @@ namespace json
                         else
                         {
                             if (static_cast<char>(*iterator++) != ',')
-                                throw ParseError("Invalid object");
+                                throw ParseError{"Invalid object"};
 
                             iterator = skipWhitespaces(iterator, end);
                         }
@@ -436,7 +436,7 @@ namespace json
                     }
 
                     if (iterator == end || static_cast<char>(*iterator) != ']')
-                        throw ParseError("Invalid array");
+                        throw ParseError{"Invalid array"};
 
                     ++iterator;
 
@@ -455,7 +455,7 @@ namespace json
                         if (++iterator == end ||
                             static_cast<char>(*iterator) < '0' ||
                             static_cast<char>(*iterator) > '9')
-                            throw ParseError("Invalid number");
+                            throw ParseError{"Invalid number"};
                     }
 
                     while (iterator != end &&
@@ -491,7 +491,7 @@ namespace json
                         value.push_back(static_cast<char>(*iterator));
 
                         if (++iterator == end)
-                            throw ParseError("Invalid exponent");
+                            throw ParseError{"Invalid exponent"};
 
                         if (static_cast<char>(*iterator) == '+' ||
                             static_cast<char>(*iterator) == '-')
@@ -500,7 +500,7 @@ namespace json
                         if (iterator == end ||
                             static_cast<char>(*iterator) < '0' ||
                             static_cast<char>(*iterator) > '9')
-                            throw ParseError("Invalid exponent");
+                            throw ParseError{"Invalid exponent"};
 
                         while (iterator != end &&
                                static_cast<char>(*iterator) >= '0' &&
@@ -546,7 +546,7 @@ namespace json
                     if (isNull)
                         return std::pair(Value{nullptr}, iterator);
 
-                    throw ParseError("Unexpected identifier");
+                    throw ParseError{"Unexpected identifier"};
                 }
             }
 
@@ -556,7 +556,7 @@ namespace json
                 Iterator iterator = begin;
 
                 if (iterator == end || static_cast<char>(*iterator) != '"')
-                    throw ParseError("Invalid string");
+                    throw ParseError{"Invalid string"};
 
                 ++iterator;
 
@@ -565,7 +565,7 @@ namespace json
                     if (static_cast<char>(*iterator) == '\\')
                     {
                         if (++iterator == end)
-                            throw ParseError("Unterminated string literal");
+                            throw ParseError{"Unterminated string literal"};
 
                         switch (static_cast<char>(*iterator))
                         {
@@ -584,7 +584,7 @@ namespace json
                                 for (std::uint32_t i = 0; i < 4; ++i)
                                 {
                                     if (iterator == end)
-                                        throw ParseError("Unexpected end of data");
+                                        throw ParseError{"Unexpected end of data"};
 
                                     std::uint8_t code = 0;
 
@@ -595,7 +595,7 @@ namespace json
                                     else if (static_cast<char>(*iterator) >= 'A' && static_cast<char>(*iterator) <='F')
                                         code = static_cast<std::uint8_t>(*iterator) - 'A' + 10;
                                     else
-                                        throw ParseError("Invalid character code");
+                                        throw ParseError{"Invalid character code"};
 
                                     c = (c << 4) | code;
 
@@ -626,11 +626,11 @@ namespace json
                                 break;
                             }
                             default:
-                                throw ParseError("Unrecognized escape character");
+                                throw ParseError{"Unrecognized escape character"};
                         }
                     }
                     else if (static_cast<std::uint8_t>(*iterator) <= 0x1F) // control char
-                        throw ParseError("Unterminated string literal");
+                        throw ParseError{"Unterminated string literal"};
                     else
                         result.push_back(static_cast<char>(*iterator));
 
@@ -638,7 +638,7 @@ namespace json
                 }
 
                 if (iterator == end || static_cast<char>(*iterator) != '"')
-                    throw ParseError("Invalid string");
+                    throw ParseError{"Invalid string"};
 
                 ++iterator;
 
@@ -772,7 +772,7 @@ namespace json
                         else result.insert(result.end(), {'f', 'a', 'l', 's', 'e'});
                         break;
                     default:
-                        throw ParseError("Unknown value type");
+                        throw ParseError{"Unknown value type"};
                 }
             }
         };
