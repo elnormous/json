@@ -64,40 +64,35 @@ namespace json
             return *this;
         }
 
-        Value& operator=(const bool v) noexcept
+        template <typename T, typename std::enable_if_t<
+            std::is_same_v<T, bool> ||
+            std::is_same_v<T, Array> ||
+            std::is_same_v<T, Object> ||
+            std::is_same_v<T, String>
+        >* = nullptr>
+        Value& operator=(const T v) noexcept
         {
             value = v;
             return *this;
         }
 
-        template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T> && !std::is_same_v<T, bool>>* = nullptr>
+        template <typename T, typename std::enable_if_t<
+            std::is_arithmetic_v<T> &&
+            !std::is_same_v<T, bool>
+        >* = nullptr>
         Value& operator=(const T v) noexcept
         {
             value = static_cast<double>(v);
             return *this;
         }
 
-        Value& operator=(const Array& v)
+        template <typename T, typename std::enable_if_t<
+            std::is_same_v<T, char*> ||
+            std::is_same_v<T, const char*>
+        >* = nullptr>
+        Value& operator=(T v)
         {
-            value = v;
-            return *this;
-        }
-
-        Value& operator=(const Object& v)
-        {
-            value = v;
-            return *this;
-        }
-
-        Value& operator=(const String& v)
-        {
-            value = v;
-            return *this;
-        }
-
-        Value& operator=(const char* v)
-        {
-            value = std::string{v};
+            value = String{v};
             return *this;
         }
 
@@ -110,20 +105,23 @@ namespace json
         template <typename T, typename std::enable_if_t<std::is_same_v<T, bool>>* = nullptr>
         T as() const
         {
-            if (const auto b = std::get_if<bool>(&value); b != nullptr)
+            if (const auto b = std::get_if<bool>(&value))
                 return *b;
-            else if (const auto d = std::get_if<double>(&value); d != nullptr)
+            else if (const auto d = std::get_if<double>(&value))
                 return *d != 0.0;
             else
                 throw TypeError{"Wrong type"};
         }
 
-        template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T> && !std::is_same_v<T, bool>>* = nullptr>
+        template <typename T, typename std::enable_if_t<
+            std::is_arithmetic_v<T> &&
+            !std::is_same_v<T, bool>
+        >* = nullptr>
         T as() const
         {
-            if (const auto d = std::get_if<double>(&value); d != nullptr)
+            if (const auto d = std::get_if<double>(&value))
                 return static_cast<T>(*d);
-            else if (const auto b = std::get_if<bool>(&value); b != nullptr)
+            else if (const auto b = std::get_if<bool>(&value))
                 return *b ? 1.0 : 0.0;
             else
                 throw TypeError{"Wrong type"};
@@ -132,7 +130,7 @@ namespace json
         template <typename T, typename std::enable_if_t<std::is_same_v<T, Array>>* = nullptr>
         T& as()
         {
-            if (const auto p = std::get_if<Array>(&value); p != nullptr)
+            if (const auto p = std::get_if<Array>(&value))
                 return *p;
             else
                 throw TypeError{"Wrong type"};
@@ -141,7 +139,7 @@ namespace json
         template <typename T, typename std::enable_if_t<std::is_same_v<T, Array>>* = nullptr>
         const T& as() const
         {
-            if (const auto p = std::get_if<Array>(&value); p != nullptr)
+            if (const auto p = std::get_if<Array>(&value))
                 return *p;
             else
                 throw TypeError{"Wrong type"};
@@ -150,7 +148,7 @@ namespace json
         template <typename T, typename std::enable_if_t<std::is_same_v<T, Object>>* = nullptr>
         T& as()
         {
-            if (const auto p = std::get_if<Object>(&value); p != nullptr)
+            if (const auto p = std::get_if<Object>(&value))
                 return *p;
             else
                 throw TypeError{"Wrong type"};
@@ -159,7 +157,7 @@ namespace json
         template <typename T, typename std::enable_if_t<std::is_same_v<T, Object>>* = nullptr>
         const T& as() const
         {
-            if (const auto p = std::get_if<Object>(&value); p != nullptr)
+            if (const auto p = std::get_if<Object>(&value))
                 return *p;
             else
                 throw TypeError{"Wrong type"};
@@ -168,7 +166,7 @@ namespace json
         template <typename T, typename std::enable_if_t<std::is_same_v<T, String>>* = nullptr>
         String& as()
         {
-            if (const auto p = std::get_if<String>(&value); p != nullptr)
+            if (const auto p = std::get_if<String>(&value))
                 return *p;
             else
                 throw TypeError{"Wrong type"};
@@ -177,16 +175,19 @@ namespace json
         template <typename T, typename std::enable_if_t<std::is_same_v<T, String>>* = nullptr>
         const String& as() const
         {
-            if (const auto p = std::get_if<String>(&value); p != nullptr)
+            if (const auto p = std::get_if<String>(&value))
                 return *p;
             else
                 throw TypeError{"Wrong type"};
         }
 
-        template <typename T, typename std::enable_if_t<std::is_same_v<T, const char*>>* = nullptr>
+        template <typename T, typename std::enable_if_t<
+            std::is_same_v<T, char*> ||
+            std::is_same_v<T, const char*>
+        >* = nullptr>
         T as() const
         {
-            if (const auto p = std::get_if<String>(&value); p != nullptr)
+            if (const auto p = std::get_if<String>(&value))
                 return p->c_str();
             else
                 throw TypeError{"Wrong type"};
@@ -194,7 +195,7 @@ namespace json
 
         Array::iterator begin()
         {
-            if (const auto p = std::get_if<Array>(&value); p != nullptr)
+            if (const auto p = std::get_if<Array>(&value))
                 return p->begin();
             else
                 throw TypeError{"Wrong type"};
@@ -202,7 +203,7 @@ namespace json
 
         Array::iterator end()
         {
-            if (const auto p = std::get_if<Array>(&value); p != nullptr)
+            if (const auto p = std::get_if<Array>(&value))
                 return p->end();
             else
                 throw TypeError{"Wrong type"};
@@ -210,7 +211,7 @@ namespace json
 
         Array::const_iterator begin() const
         {
-            if (const auto p = std::get_if<Array>(&value); p != nullptr)
+            if (const auto p = std::get_if<Array>(&value))
                 return p->begin();
             else
                 throw TypeError{"Wrong type"};
@@ -218,7 +219,7 @@ namespace json
 
         Array::const_iterator end() const
         {
-            if (const auto p = std::get_if<Array>(&value); p != nullptr)
+            if (const auto p = std::get_if<Array>(&value))
                 return p->end();
             else
                 throw TypeError{"Wrong type"};
@@ -226,7 +227,7 @@ namespace json
 
         bool hasMember(const std::string& member) const
         {
-            if (const auto p = std::get_if<Object>(&value); p != nullptr)
+            if (const auto p = std::get_if<Object>(&value))
                 return p->find(member) != p->end();
             else
                 throw TypeError{"Wrong type"};
@@ -234,7 +235,7 @@ namespace json
 
         Value& operator[](const std::string& member) &
         {
-            if (const auto p = std::get_if<Object>(&value); p != nullptr)
+            if (const auto p = std::get_if<Object>(&value))
                 return (*p)[member];
             else
                 throw TypeError{"Wrong type"};
@@ -242,7 +243,7 @@ namespace json
 
         const Value& operator[](const std::string& member) const&
         {
-            if (const auto p = std::get_if<Object>(&value); p != nullptr)
+            if (const auto p = std::get_if<Object>(&value))
             {
                 const auto i = p->find(member);
                 if (i != p->end())
@@ -256,7 +257,7 @@ namespace json
 
         Value& operator[](std::size_t index) &
         {
-            if (const auto p = std::get_if<Array>(&value); p != nullptr)
+            if (const auto p = std::get_if<Array>(&value))
             {
                 if (index >= p->size()) p->resize(index + 1);
                 return (*p)[index];
@@ -267,7 +268,7 @@ namespace json
 
         const Value& operator[](std::size_t index) const&
         {
-            if (const auto p = std::get_if<Array>(&value); p != nullptr)
+            if (const auto p = std::get_if<Array>(&value))
             {
                 if (index < p->size())
                     return (*p)[index];
@@ -280,7 +281,7 @@ namespace json
 
         bool isEmpty() const
         {
-            if (const auto p = std::get_if<Array>(&value); p != nullptr)
+            if (const auto p = std::get_if<Array>(&value))
                 return p->empty();
             else
                 throw TypeError{"Wrong type"};
@@ -288,7 +289,7 @@ namespace json
 
         std::size_t getSize() const
         {
-            if (const auto p = std::get_if<Array>(&value); p != nullptr)
+            if (const auto p = std::get_if<Array>(&value))
                 return p->size();
             else
                 throw TypeError{"Wrong type"};
@@ -296,7 +297,7 @@ namespace json
 
         void resize(std::size_t size) &
         {
-            if (const auto p = std::get_if<Array>(&value); p != nullptr)
+            if (const auto p = std::get_if<Array>(&value))
                 return p->resize(size);
             else
                 throw TypeError{"Wrong type"};
@@ -304,7 +305,7 @@ namespace json
 
         void pushBack(const Value& v) &
         {
-            if (const auto p = std::get_if<Array>(&value); p != nullptr)
+            if (const auto p = std::get_if<Array>(&value))
                 return p->push_back(v);
             else
                 throw TypeError{"Wrong type"};
@@ -728,20 +729,20 @@ namespace json
                 {
                     result.insert(result.end(), {'n', 'u', 'l', 'l'});
                 }
-                else if (auto d = std::get_if<double>(&v); d != nullptr)
+                else if (auto d = std::get_if<double>(&v))
                 {
                     const auto str = (std::floor(*d) == *d) ?
                         std::to_string(static_cast<std::int64_t>(*d)) :
                         std::to_string(*d);
                     result.insert(result.end(), str.begin(), str.end());
                 }
-                else if (auto s = std::get_if<Value::String>(&v); s != nullptr)
+                else if (auto s = std::get_if<Value::String>(&v))
                 {
                     result.push_back('"');
                     encode(*s, result);
                     result.push_back('"');
                 }
-                else if (auto o = std::get_if<Value::Object>(&v); o != nullptr)
+                else if (auto o = std::get_if<Value::Object>(&v))
                 {
                     result.push_back('{');
                     if (whitespaces) result.push_back('\n');
@@ -761,7 +762,7 @@ namespace json
                     if (whitespaces) result.insert(result.end(), level, '\t');
                     result.push_back('}');
                 }
-                else if (auto a = std::get_if<Value::Array>(&v); a != nullptr)
+                else if (auto a = std::get_if<Value::Array>(&v))
                 {
                     result.push_back('[');
                     if (whitespaces) result.push_back('\n');
@@ -778,7 +779,7 @@ namespace json
                     if (whitespaces) result.insert(result.end(), level, '\t');
                     result.push_back(']');
                 }
-                else if (auto b = std::get_if<bool>(&v); b != nullptr)
+                else if (auto b = std::get_if<bool>(&v))
                 {
                     if (*b) result.insert(result.end(), {'t', 'r', 'u', 'e'});
                     else result.insert(result.end(), {'f', 'a', 'l', 's', 'e'});
