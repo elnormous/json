@@ -130,14 +130,12 @@ namespace json
         }
 
         template <typename T, typename std::enable_if_t<std::is_same_v<T, Array>>* = nullptr>
-        T& as() noexcept
+        T& as()
         {
             if (const auto p = std::get_if<Array>(&value))
                 return *p;
-
-            value = Array{};
-            const auto p = std::get_if<Array>(&value);
-            return *p;
+            else
+                throw TypeError{"Wrong type"};
         }
 
         template <typename T, typename std::enable_if_t<std::is_same_v<T, Array>>* = nullptr>
@@ -150,14 +148,12 @@ namespace json
         }
 
         template <typename T, typename std::enable_if_t<std::is_same_v<T, Object>>* = nullptr>
-        T& as() noexcept
+        T& as()
         {
             if (const auto p = std::get_if<Object>(&value))
                 return *p;
-
-            value = Object{};
-            const auto p = std::get_if<Object>(&value);
-            return *p;
+            else
+                throw TypeError{"Wrong type"};
         }
 
         template <typename T, typename std::enable_if_t<std::is_same_v<T, Object>>* = nullptr>
@@ -170,14 +166,12 @@ namespace json
         }
 
         template <typename T, typename std::enable_if_t<std::is_same_v<T, String>>* = nullptr>
-        String& as() noexcept
+        String& as()
         {
             if (const auto p = std::get_if<String>(&value))
                 return *p;
-
-            value = String{};
-            const auto p = std::get_if<String>(&value);
-            return *p;
+            else
+                throw TypeError{"Wrong type"};
         }
 
         template <typename T, typename std::enable_if_t<std::is_same_v<T, String>>* = nullptr>
@@ -242,10 +236,8 @@ namespace json
         {
             if (const auto p = std::get_if<Object>(&value))
                 return (*p)[member];
-
-            value = Object{};
-            const auto p = std::get_if<Object>(&value);
-            return (*p)[member];
+            else
+                throw TypeError{"Wrong type"};
         }
 
         const Value& operator[](const std::string& member) const&
@@ -270,12 +262,7 @@ namespace json
                 return (*p)[index];
             }
             else
-            {
-                value = Array{};
-                const auto a = std::get_if<Array>(&value);
-                a->resize(index + 1);
-                return (*a)[index];
-            }
+                throw TypeError{"Wrong type"};
         }
 
         const Value& operator[](std::size_t index) const&
