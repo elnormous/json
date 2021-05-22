@@ -41,7 +41,7 @@ namespace json
         using Object = std::map<std::string, Value>;
         using String = std::string;
 
-        Value() = default;
+        Value() noexcept = default;
 
         template <typename T, typename std::enable_if_t<
             std::is_same_v<T, std::nullptr_t> ||
