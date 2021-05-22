@@ -135,7 +135,7 @@ namespace json
             if (const auto d = std::get_if<double>(&value))
                 return static_cast<T>(*d);
             else if (const auto b = std::get_if<bool>(&value))
-                return *b ? 1.0 : 0.0;
+                return *b ? T(1.0) : T(0.0);
             else
                 throw TypeError{"Wrong type"};
         }
@@ -552,9 +552,9 @@ namespace json
                 }
                 else
                 {
-                    constexpr std::array trueString{'t', 'r', 'u', 'e'};
-                    constexpr std::array falseString{'f', 'a', 'l', 's', 'e'};
-                    constexpr std::array nullString{'n', 'u', 'l', 'l'};
+                    constexpr char trueString[] = "true";
+                    constexpr char falseString[] = "false";
+                    constexpr char nullString[] = "null";
 
                     const auto [isTrue, trueIterator] = isSame(iterator, end,
                                                                std::begin(trueString),
