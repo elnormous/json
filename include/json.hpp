@@ -43,32 +43,34 @@ namespace json
 
         Value() = default;
 
-        Value(const std::nullptr_t): value{nullptr} {}
-
-        Value(const bool v): value{v} {}
-
-        template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T> && !std::is_same_v<T, bool>>* = nullptr>
-        Value(const T value): value{static_cast<double>(value)} {}
-
-        Value(const Array& v): value{v} {}
-
-        Value(const Object& v): value{v} {}
-
-        Value(const String& v): value{v} {}
-
-        Value(const char* v): value{v} {}
-
-        Value& operator=(std::nullptr_t) noexcept
-        {
-            value = nullptr;
-            return *this;
-        }
+        template <typename T, typename std::enable_if_t<
+            std::is_same_v<T, std::nullptr_t> ||
+            std::is_same_v<T, bool>
+        >* = nullptr>
+        Value(const T v) noexcept: value{v} {}
 
         template <typename T, typename std::enable_if_t<
-            std::is_same_v<T, bool> ||
+            std::is_arithmetic_v<T> &&
+            !std::is_same_v<T, bool>
+        >* = nullptr>
+        Value(const T value): value{static_cast<double>(value)} {}
+
+        template <typename T, typename std::enable_if_t<
             std::is_same_v<T, Array> ||
             std::is_same_v<T, Object> ||
             std::is_same_v<T, String>
+        >* = nullptr>
+        Value(const T& v): value{v} {}
+
+        template <typename T, typename std::enable_if_t<
+            std::is_same_v<T, char*> ||
+            std::is_same_v<T, const char*>
+        >* = nullptr>
+        Value(T v): value{String{v}} {}
+
+        template <typename T, typename std::enable_if_t<
+            std::is_same_v<T, std::nullptr_t> ||
+            std::is_same_v<T, bool>
         >* = nullptr>
         Value& operator=(const T v) noexcept
         {
@@ -83,6 +85,17 @@ namespace json
         Value& operator=(const T v) noexcept
         {
             value = static_cast<double>(v);
+            return *this;
+        }
+
+        template <typename T, typename std::enable_if_t<
+            std::is_same_v<T, Array> ||
+            std::is_same_v<T, Object> ||
+            std::is_same_v<T, String>
+        >* = nullptr>
+        Value& operator=(T&& v)
+        {
+            value = std::forward<T>(v);
             return *this;
         }
 
