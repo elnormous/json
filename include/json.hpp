@@ -110,10 +110,10 @@ namespace json
         template <typename T, typename std::enable_if_t<std::is_same_v<T, bool>>* = nullptr>
         T as() const
         {
-            if (auto boolResult = std::get_if<bool>(&value))
-                return *boolResult;
-            else if (auto doubleResult = std::get_if<double>(&value))
-                return *doubleResult != 0.0;
+            if (const auto b = std::get_if<bool>(&value))
+                return *b;
+            else if (const auto d = std::get_if<double>(&value))
+                return *d != 0.0;
             else
                 throw TypeError{"Wrong type"};
         }
@@ -121,10 +121,10 @@ namespace json
         template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T> && !std::is_same_v<T, bool>>* = nullptr>
         T as() const
         {
-            if (auto doubleResult = std::get_if<double>(&value))
-                return static_cast<T>(*doubleResult);
-            else if (auto boolResult = std::get_if<bool>(&value))
-                return *boolResult ? 1.0 : 0.0;
+            if (const auto d = std::get_if<double>(&value))
+                return static_cast<T>(*d);
+            else if (const auto b = std::get_if<bool>(&value))
+                return *b ? 1.0 : 0.0;
             else
                 throw TypeError{"Wrong type"};
         }
@@ -141,7 +141,7 @@ namespace json
         template <typename T, typename std::enable_if_t<std::is_same_v<T, Array>>* = nullptr>
         const T& as() const
         {
-            if (auto result = std::get_if<Array>(&value))
+            if (const auto result = std::get_if<Array>(&value))
                 return *result;
             else
                 throw TypeError{"Wrong type"};
@@ -177,8 +177,8 @@ namespace json
         template <typename T, typename std::enable_if_t<std::is_same_v<T, String>>* = nullptr>
         const String& as() const
         {
-            if (auto result = std::get_if<String>(&value))
-                return *result;
+            if (const auto p = std::get_if<String>(&value))
+                return *p;
             else
                 throw TypeError{"Wrong type"};
         }
@@ -186,16 +186,16 @@ namespace json
         template <typename T, typename std::enable_if_t<std::is_same_v<T, const char*>>* = nullptr>
         T as() const
         {
-            if (auto result = std::get_if<String>(&value))
-                return result->c_str();
+            if (const auto p = std::get_if<String>(&value))
+                return p->c_str();
             else
                 throw TypeError{"Wrong type"};
         }
 
         Array::iterator begin()
         {
-            if (auto result = std::get_if<Array>(&value))
-                return result->begin();
+            if (const auto p = std::get_if<Array>(&value))
+                return p->begin();
             else
                 throw TypeError{"Wrong type"};
         }
