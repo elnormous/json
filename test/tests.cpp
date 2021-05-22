@@ -211,6 +211,14 @@ TEST_CASE("Constructors")
         REQUIRE(v.as<std::string>() == "s");
     }
 
+    SECTION("Char array")
+    {
+        char s[] = "s";
+        const json::Value v = s;
+        REQUIRE(v.is<json::Value::String>());
+        REQUIRE(v.as<std::string>() == "s");
+    }
+
     SECTION("Object")
     {
         const  json::Value v = json::Value::Object{};
@@ -262,6 +270,15 @@ TEST_CASE("Setters")
     {
         json::Value v;
         v = "s";
+        REQUIRE(v.is<json::Value::String>());
+        REQUIRE(v.as<std::string>() == "s");
+    }
+
+    SECTION("Char array")
+    {
+        char s[] = "s";
+        json::Value v;
+        v = s;
         REQUIRE(v.is<json::Value::String>());
         REQUIRE(v.as<std::string>() == "s");
     }
