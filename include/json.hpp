@@ -66,7 +66,7 @@ namespace json
             std::is_same_v<T, char*> ||
             std::is_same_v<T, const char*>
         >* = nullptr>
-        Value(T v): value{String{v}} {}
+        Value(const T v): value{String{v}} {}
 
         template <typename T, typename std::enable_if_t<
             std::is_same_v<T, std::nullptr_t> ||
@@ -103,7 +103,7 @@ namespace json
             std::is_same_v<T, char*> ||
             std::is_same_v<T, const char*>
         >* = nullptr>
-        Value& operator=(T v)
+        Value& operator=(const T v)
         {
             value = String{v};
             return *this;
