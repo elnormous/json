@@ -354,8 +354,8 @@ namespace json
         private:
             static bool hasByteOrderMark(Iterator begin, Iterator end) noexcept
             {
-                for (auto i = std::begin(utf8ByteOrderMark); i != std::end(utf8ByteOrderMark); ++i)
-                    if (begin == end || static_cast<std::uint8_t>(*begin) != *i)
+                for (const auto b : utf8ByteOrderMark)
+                    if (begin == end || static_cast<std::uint8_t>(*begin) != b)
                         return false;
                     else
                         ++begin;
