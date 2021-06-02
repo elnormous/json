@@ -701,8 +701,8 @@ namespace json
             static std::string encode(const Value& value, bool whitespaces, bool byteOrderMark)
             {
                 std::string result;
-                if (byteOrderMark) result.assign(std::begin(utf8ByteOrderMark),
-                                                 std::end(utf8ByteOrderMark));
+                if (byteOrderMark) result.assign(utf8ByteOrderMark.begin(),
+                                                 utf8ByteOrderMark.end());
                 encode(value, result, whitespaces);
                 return result;
             }
