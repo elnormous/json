@@ -208,7 +208,7 @@ namespace json
                 throw TypeError{"Wrong type"};
         }
 
-        Array::iterator begin()
+        auto begin()
         {
             if (const auto p = std::get_if<Array>(&value))
                 return p->begin();
@@ -216,7 +216,7 @@ namespace json
                 throw TypeError{"Wrong type"};
         }
 
-        Array::iterator end()
+        auto end()
         {
             if (const auto p = std::get_if<Array>(&value))
                 return p->end();
@@ -224,7 +224,7 @@ namespace json
                 throw TypeError{"Wrong type"};
         }
 
-        Array::const_iterator begin() const
+        auto begin() const
         {
             if (const auto p = std::get_if<Array>(&value))
                 return p->begin();
@@ -232,7 +232,7 @@ namespace json
                 throw TypeError{"Wrong type"};
         }
 
-        Array::const_iterator end() const
+        auto end() const
         {
             if (const auto p = std::get_if<Array>(&value))
                 return p->end();
