@@ -53,74 +53,74 @@ TEST_CASE("Bool", "[bool]")
 TEST_CASE("String", "[string]")
 {
     const json::Value d = json::parse("\"\"");
-    REQUIRE(d.is<json::Value::String>());
+    REQUIRE(d.is<json::String>());
 }
 
 TEST_CASE("Empty object", "[empty_object]")
 {
     const json::Value d = json::parse("{}");
-    REQUIRE(d.is<json::Value::Object>());
+    REQUIRE(d.is<json::Object>());
 }
 
 TEST_CASE("Object", "[object]")
 {
     json::Value d;
     d = json::parse("{\"a\" : \"b\", \"c\": [1, 2 ], \"d\": {\"x\"\r: \"y\"} }");
-    REQUIRE(d.is<json::Value::Object>());
+    REQUIRE(d.is<json::Object>());
     REQUIRE(d.hasMember("a"));
-    REQUIRE(d["a"].is<json::Value::String>());
+    REQUIRE(d["a"].is<json::String>());
     REQUIRE(d["a"].as<std::string>() == "b");
     REQUIRE(d.hasMember("c"));
-    REQUIRE(d["c"].is<json::Value::Array>());
+    REQUIRE(d["c"].is<json::Array>());
     REQUIRE(d.hasMember("d"));
-    REQUIRE(d["d"].is<json::Value::Object>());
+    REQUIRE(d["d"].is<json::Object>());
 }
 
 TEST_CASE("EmptyArray", "[empty_array]")
 {
     const json::Value d = json::parse("[]");
-    REQUIRE(d.is<json::Value::Array>());
-    REQUIRE(d.as<json::Value::Array>().empty());
+    REQUIRE(d.is<json::Array>());
+    REQUIRE(d.as<json::Array>().empty());
 }
 
 TEST_CASE("Array", "[array]")
 {
     const json::Value d = json::parse("[1, 2\t , {}\n, \"\"]");
-    REQUIRE(d.is<json::Value::Array>());
-    REQUIRE(d.as<json::Value::Array>().size() == 4);
+    REQUIRE(d.is<json::Array>());
+    REQUIRE(d.as<json::Array>().size() == 4);
     REQUIRE(d[0].is<double>());
     REQUIRE(d[1].is<double>());
     REQUIRE(d[0].as<int>() == 1);
     REQUIRE(d[1].as<int>() == 2);
-    REQUIRE(d[2].is<json::Value::Object>());
-    REQUIRE(d[3].is<json::Value::String>());
+    REQUIRE(d[2].is<json::Object>());
+    REQUIRE(d[3].is<json::String>());
 }
 
 TEST_CASE("Unicode", "[unicode]")
 {
     const json::Value d = json::parse("\"ē–\"");
-    REQUIRE(d.is<json::Value::String>());
+    REQUIRE(d.is<json::String>());
     REQUIRE(d.as<std::string>() == "ē–");
 }
 
 TEST_CASE("Escape", "[escape]")
 {
     const json::Value d = json::parse("\"\\b\\f\\n\\r\\t\"");
-    REQUIRE(d.is<json::Value::String>());
+    REQUIRE(d.is<json::String>());
     REQUIRE(d.as<std::string>() == "\b\f\n\r\t");
 }
 
 TEST_CASE("Encoding", "[encoding]")
 {
-    const json::Value d = json::Value::Object{
+    const json::Value d = json::Object{
         {"n", nullptr},
         {"i", 1},
         {"f", 2.1F},
         {"s", "foo"},
         {"b", true},
-        {"a", json::Value::Array{
+        {"a", json::Array{
             true, 1, 2.1F, "3",
-            json::Value::Array{1, 2, 3}}
+            json::Array{1, 2, 3}}
         }
     };
 
@@ -137,7 +137,7 @@ TEST_CASE("Byte", "[byte]")
     };
 
     const json::Value d = json::parse(data);
-    REQUIRE(d.is<json::Value::Object>());
+    REQUIRE(d.is<json::Object>());
 }
 
 TEST_CASE("ParseBraceError", "[parse_brace_error]")
@@ -178,7 +178,7 @@ TEST_CASE("TypeError", "[type_error]")
 
 TEST_CASE("RangeError", "[range_error]")
 {
-    const json::Value v = json::Value::Array{};
+    const json::Value v = json::Array{};
     REQUIRE_THROWS_AS(v[0], json::RangeError);
 }
 
@@ -207,7 +207,7 @@ TEST_CASE("Constructors")
     SECTION("String")
     {
         const json::Value v = "s";
-        REQUIRE(v.is<json::Value::String>());
+        REQUIRE(v.is<json::String>());
         REQUIRE(v.as<std::string>() == "s");
     }
 
@@ -215,22 +215,22 @@ TEST_CASE("Constructors")
     {
         char s[] = "s";
         const json::Value v = s;
-        REQUIRE(v.is<json::Value::String>());
+        REQUIRE(v.is<json::String>());
         REQUIRE(v.as<std::string>() == "s");
     }
 
     SECTION("Object")
     {
-        const  json::Value v = json::Value::Object{};
-        REQUIRE(v.is<json::Value::Object>());
-        REQUIRE(v.as<json::Value::Object>().empty());
+        const  json::Value v = json::Object{};
+        REQUIRE(v.is<json::Object>());
+        REQUIRE(v.as<json::Object>().empty());
     }
 
     SECTION("Array")
     {
-        const json::Value v = json::Value::Array{};
-        REQUIRE(v.is<json::Value::Array>());
-        REQUIRE(v.as<json::Value::Array>().empty());
+        const json::Value v = json::Array{};
+        REQUIRE(v.is<json::Array>());
+        REQUIRE(v.as<json::Array>().empty());
     }
 
     SECTION("Boolean")
@@ -270,7 +270,7 @@ TEST_CASE("Setters")
     {
         json::Value v;
         v = "s";
-        REQUIRE(v.is<json::Value::String>());
+        REQUIRE(v.is<json::String>());
         REQUIRE(v.as<std::string>() == "s");
     }
 
@@ -279,30 +279,30 @@ TEST_CASE("Setters")
         char s[] = "s";
         json::Value v;
         v = s;
-        REQUIRE(v.is<json::Value::String>());
+        REQUIRE(v.is<json::String>());
         REQUIRE(v.as<std::string>() == "s");
     }
 
     SECTION("Object")
     {
         json::Value v;
-        v = json::Value::Object{};
-        REQUIRE(v.is<json::Value::Object>());
-        REQUIRE(v.as<json::Value::Object>().empty());
+        v = json::Object{};
+        REQUIRE(v.is<json::Object>());
+        REQUIRE(v.as<json::Object>().empty());
     }
 
     SECTION("Array")
     {
         json::Value v;
-        v = json::Value::Array{};
-        REQUIRE(v.is<json::Value::Array>());
-        REQUIRE(v.as<json::Value::Array>().empty());
+        v = json::Array{};
+        REQUIRE(v.is<json::Array>());
+        REQUIRE(v.as<json::Array>().empty());
     }
 
     SECTION("Array push back")
     {
         json::Value v;
-        v = json::Value::Array{};
+        v = json::Array{};
         v.pushBack(10);
         REQUIRE(!v.isEmpty());
         REQUIRE(v.getSize() == 1);
