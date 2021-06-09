@@ -344,3 +344,30 @@ TEST_CASE("BoolCast")
         REQUIRE(v.as<bool>());
     }
 }
+
+TEST_CASE("Range-based for loop")
+{
+    SECTION("Mutable")
+    {
+        json::Value v = json::Array{json::Value{0}, json::Value{1}};
+
+        int counter = 0;
+
+        for (json::Value& i : v)
+            REQUIRE(i.as<int>() == counter++);
+
+        REQUIRE(counter == 2);
+    }
+
+    SECTION("Const")
+    {
+        const json::Value v = json::Array{json::Value{0}, json::Value{1}};
+
+        int counter = 0;
+
+        for (const json::Value& i : v)
+            REQUIRE(i.as<int>() == counter++);
+
+        REQUIRE(counter == 2);
+    }
+}
