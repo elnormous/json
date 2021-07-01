@@ -4,65 +4,59 @@
 #include "catch2/catch.hpp"
 #include "json.hpp"
 
-TEST_CASE("Null", "[null]")
+TEST_CASE("Parse null", "[parsing]")
 {
     const json::Value d = json::parse("null");
     REQUIRE(d.is<std::nullptr_t>());
 }
 
-TEST_CASE("Integer", "[integer]")
+TEST_CASE("Parse integer", "[parsing]")
 {
     const json::Value d = json::parse("10");
     REQUIRE(d.is<double>());
     REQUIRE(d.as<int>() == 10);
 }
 
-TEST_CASE("Float", "[float]")
+TEST_CASE("Parse float", "[parsing]")
 {
-    SECTION("Float")
-    {
-        const json::Value d = json::parse("0.5");
-        REQUIRE(d.is<double>());
-        REQUIRE(d.as<float>() == Approx(0.5F));
-    }
-
-    SECTION("Exponent")
-    {
-        const auto e = json::parse("0.1e1");
-        REQUIRE(e.as<float>() == Approx(1.0F));
-    }
+    const json::Value d = json::parse("0.5");
+    REQUIRE(d.is<double>());
+    REQUIRE(d.as<float>() == Approx(0.5F));
 }
 
-TEST_CASE("Bool", "[bool]")
+TEST_CASE("Parse float with exponent", "[parsing]")
 {
-    SECTION("True")
-    {
-        const json::Value d = json::parse("true");
-        REQUIRE(d.is<bool>());
-        REQUIRE(d.as<bool>());
-    }
-
-    SECTION("False")
-    {
-        const json::Value d = json::parse("false");
-        REQUIRE(d.is<bool>());
-        REQUIRE_FALSE(d.as<bool>());
-    }
+    const auto e = json::parse("0.1e1");
+    REQUIRE(e.as<float>() == Approx(1.0F));
 }
 
-TEST_CASE("String", "[string]")
+TEST_CASE("Parse true", "[parsing]")
+{
+    const json::Value d = json::parse("true");
+    REQUIRE(d.is<bool>());
+    REQUIRE(d.as<bool>());
+}
+
+TEST_CASE("Parse false", "[parsing]")
+{
+    const json::Value d = json::parse("false");
+    REQUIRE(d.is<bool>());
+    REQUIRE_FALSE(d.as<bool>());
+}
+
+TEST_CASE("Parse string", "[parsing]")
 {
     const json::Value d = json::parse("\"\"");
     REQUIRE(d.is<json::String>());
 }
 
-TEST_CASE("Empty object", "[empty_object]")
+TEST_CASE("Parse empty object", "[parsing]")
 {
     const json::Value d = json::parse("{}");
     REQUIRE(d.is<json::Object>());
 }
 
-TEST_CASE("Object", "[object]")
+TEST_CASE("Parse object", "[parsing]")
 {
     json::Value d;
     d = json::parse("{\"a\" : \"b\", \"c\": [1, 2 ], \"d\": {\"x\"\r: \"y\"} }");
@@ -76,14 +70,14 @@ TEST_CASE("Object", "[object]")
     REQUIRE(d["d"].is<json::Object>());
 }
 
-TEST_CASE("EmptyArray", "[empty_array]")
+TEST_CASE("Parse empty array", "[parsing]")
 {
     const json::Value d = json::parse("[]");
     REQUIRE(d.is<json::Array>());
     REQUIRE(d.as<json::Array>().empty());
 }
 
-TEST_CASE("Array", "[array]")
+TEST_CASE("Parse array", "[parsing]")
 {
     const json::Value d = json::parse("[1, 2\t , {}\n, \"\"]");
     REQUIRE(d.is<json::Array>());
@@ -96,14 +90,14 @@ TEST_CASE("Array", "[array]")
     REQUIRE(d[3].is<json::String>());
 }
 
-TEST_CASE("Unicode", "[unicode]")
+TEST_CASE("Parse unicode", "[parsing]")
 {
     const json::Value d = json::parse("\"ē–\"");
     REQUIRE(d.is<json::String>());
     REQUIRE(d.as<std::string>() == "ē–");
 }
 
-TEST_CASE("Escape", "[escape]")
+TEST_CASE("Parse escape sequence", "[parsing]")
 {
     const json::Value d = json::parse("\"\\b\\f\\n\\r\\t\"");
     REQUIRE(d.is<json::String>());
@@ -140,234 +134,218 @@ TEST_CASE("Byte", "[byte]")
     REQUIRE(d.is<json::Object>());
 }
 
-TEST_CASE("ParseBraceError", "[parse_brace_error]")
+TEST_CASE("Parse brace error", "[errors]")
 {
     REQUIRE_THROWS_AS(json::parse("{"), json::ParseError);
 }
 
-TEST_CASE("ParseObjectError", "[parse_object_error]")
+TEST_CASE("Parse object error", "[errors]")
 {
     REQUIRE_THROWS_AS(json::parse("{\"\"}"), json::ParseError);
 }
 
-TEST_CASE("TypeError", "[type_error]")
+TEST_CASE("Null type error", "[errors]")
 {
-    SECTION("Null")
-    {
-        const json::Value v = nullptr;
-        REQUIRE_THROWS_AS(v.as<std::string>(), json::TypeError);
-        REQUIRE_THROWS_AS(v[0], json::TypeError);
-    }
-
-    SECTION("String")
-    {
-        const json::Value v = 0;
-        REQUIRE_THROWS_AS(v.as<std::string>(), json::TypeError);
-
-    }
-
-    SECTION("String")
-    {
-        const json::Value v = "";
-        REQUIRE_THROWS_AS(v.as<bool>(), json::TypeError);
-        REQUIRE_THROWS_AS(v.as<int>(), json::TypeError);
-        REQUIRE_THROWS_AS(v.as<float>(), json::TypeError);
-        REQUIRE_THROWS_AS(v[0], json::TypeError);
-    }
+    const json::Value v = nullptr;
+    REQUIRE_THROWS_AS(v.as<std::string>(), json::TypeError);
+    REQUIRE_THROWS_AS(v[0], json::TypeError);
 }
 
-TEST_CASE("RangeError", "[range_error]")
+TEST_CASE("Integer type error", "[errors]")
+{
+    const json::Value v = 0;
+    REQUIRE_THROWS_AS(v.as<std::string>(), json::TypeError);
+}
+
+TEST_CASE("String type error", "[errors]")
+{
+    const json::Value v = "";
+    REQUIRE_THROWS_AS(v.as<bool>(), json::TypeError);
+    REQUIRE_THROWS_AS(v.as<int>(), json::TypeError);
+    REQUIRE_THROWS_AS(v.as<float>(), json::TypeError);
+    REQUIRE_THROWS_AS(v[0], json::TypeError);
+}
+
+TEST_CASE("Range error", "[errors]")
 {
     const json::Value v = json::Array{};
     REQUIRE_THROWS_AS(v[0], json::RangeError);
 }
 
-TEST_CASE("Constructors")
+TEST_CASE("Null constructor", "[constructors]")
 {
-    SECTION("Null")
-    {
-        const json::Value v = nullptr;
-        REQUIRE(v.is<std::nullptr_t>());
-    }
-
-    SECTION("Integer")
-    {
-        const json::Value v = 10;
-        REQUIRE(v.is<double>());
-        REQUIRE(v.as<int>() == 10);
-    }
-
-    SECTION("FloatingPoint")
-    {
-        const json::Value v = 10.0;
-        REQUIRE(v.is<double>());
-        REQUIRE(v.as<double>() == 10.0);
-    }
-
-    SECTION("String")
-    {
-        const json::Value v = "s";
-        REQUIRE(v.is<json::String>());
-        REQUIRE(v.as<std::string>() == "s");
-    }
-
-    SECTION("Char array")
-    {
-        char s[] = "s";
-        const json::Value v = s;
-        REQUIRE(v.is<json::String>());
-        REQUIRE(v.as<std::string>() == "s");
-    }
-
-    SECTION("Object")
-    {
-        const  json::Value v = json::Object{};
-        REQUIRE(v.is<json::Object>());
-        REQUIRE(v.as<json::Object>().empty());
-    }
-
-    SECTION("Array")
-    {
-        const json::Value v = json::Array{};
-        REQUIRE(v.is<json::Array>());
-        REQUIRE(v.as<json::Array>().empty());
-    }
-
-    SECTION("Boolean")
-    {
-        const json::Value v = false;
-        REQUIRE(v.is<bool>());
-        REQUIRE_FALSE(v.as<bool>());
-    }
+    const json::Value v = nullptr;
+    REQUIRE(v.is<std::nullptr_t>());
 }
 
-TEST_CASE("Setters")
+TEST_CASE("Integer constructor", "[constructors]")
 {
-    SECTION("Null")
-    {
-        json::Value v;
-        v = nullptr;
-        REQUIRE(v.is<std::nullptr_t>());
-    }
-
-    SECTION("Integer")
-    {
-        json::Value v;
-        v = 10;
-        REQUIRE(v.is<double>());
-        REQUIRE(v.as<int>() == 10);
-    }
-
-    SECTION("FloatingPoint")
-    {
-        json::Value v;
-        v = 10.0;
-        REQUIRE(v.is<double>());
-        REQUIRE(v.as<double>() == 10.0);
-    }
-
-    SECTION("String")
-    {
-        json::Value v;
-        v = "s";
-        REQUIRE(v.is<json::String>());
-        REQUIRE(v.as<std::string>() == "s");
-    }
-
-    SECTION("Char array")
-    {
-        char s[] = "s";
-        json::Value v;
-        v = s;
-        REQUIRE(v.is<json::String>());
-        REQUIRE(v.as<std::string>() == "s");
-    }
-
-    SECTION("Object")
-    {
-        json::Value v;
-        v = json::Object{};
-        REQUIRE(v.is<json::Object>());
-        REQUIRE(v.as<json::Object>().empty());
-    }
-
-    SECTION("Array")
-    {
-        json::Value v;
-        v = json::Array{};
-        REQUIRE(v.is<json::Array>());
-        REQUIRE(v.as<json::Array>().empty());
-    }
-
-    SECTION("Array push back")
-    {
-        json::Value v;
-        v = json::Array{};
-        v.pushBack(10);
-        REQUIRE(!v.isEmpty());
-        REQUIRE(v.getSize() == 1);
-        REQUIRE(v[0].is<double>());
-    }
-
-    SECTION("Boolean")
-    {
-        json::Value v;
-        v = false;
-        REQUIRE(v.is<bool>());
-        REQUIRE_FALSE(v.as<bool>());
-    }
+    const json::Value v = 10;
+    REQUIRE(v.is<double>());
+    REQUIRE(v.as<int>() == 10);
 }
 
-TEST_CASE("BoolCast")
+TEST_CASE("Floating point constructor", "[constructors]")
 {
-    SECTION("ZeroFloat")
-    {
-        const json::Value v = 0.0;
-        REQUIRE_FALSE(v.as<bool>());
-    }
-
-    SECTION("PositiveFloat")
-    {
-        const json::Value v = 1.0;
-        REQUIRE(v.as<bool>());
-    }
-
-    SECTION("ZeroInteger")
-    {
-        const json::Value v = 0;
-        REQUIRE_FALSE(v.as<bool>());
-    }
-
-    SECTION("PositiveInteger")
-    {
-        const json::Value v = 1;
-        REQUIRE(v.as<bool>());
-    }
+    const json::Value v = 10.0;
+    REQUIRE(v.is<double>());
+    REQUIRE(v.as<double>() == 10.0);
 }
 
-TEST_CASE("Range-based for loop")
+TEST_CASE("String constructor", "[constructors]")
 {
-    SECTION("Mutable")
-    {
-        json::Value v = json::Array{json::Value{0}, json::Value{1}};
+    const json::Value v = "s";
+    REQUIRE(v.is<json::String>());
+    REQUIRE(v.as<std::string>() == "s");
+}
 
-        int counter = 0;
+TEST_CASE("Char array constructor", "[constructors]")
+{
+    char s[] = "s";
+    const json::Value v = s;
+    REQUIRE(v.is<json::String>());
+    REQUIRE(v.as<std::string>() == "s");
+}
 
-        for (json::Value& i : v)
-            REQUIRE(i.as<int>() == counter++);
+TEST_CASE("Object constructor", "[constructors]")
+{
+    const  json::Value v = json::Object{};
+    REQUIRE(v.is<json::Object>());
+    REQUIRE(v.as<json::Object>().empty());
+}
 
-        REQUIRE(counter == 2);
-    }
+TEST_CASE("Array constructor", "[constructors]")
+{
+    const json::Value v = json::Array{};
+    REQUIRE(v.is<json::Array>());
+    REQUIRE(v.as<json::Array>().empty());
+}
 
-    SECTION("Const")
-    {
-        const json::Value v = json::Array{json::Value{0}, json::Value{1}};
+TEST_CASE("Boolean constructor", "[constructors]")
+{
+    const json::Value v = false;
+    REQUIRE(v.is<bool>());
+    REQUIRE_FALSE(v.as<bool>());
+}
 
-        int counter = 0;
+TEST_CASE("Null setter", "[setters]")
+{
+    json::Value v;
+    v = nullptr;
+    REQUIRE(v.is<std::nullptr_t>());
+}
 
-        for (const json::Value& i : v)
-            REQUIRE(i.as<int>() == counter++);
+TEST_CASE("Integer setter", "[setters]")
+{
+    json::Value v;
+    v = 10;
+    REQUIRE(v.is<double>());
+    REQUIRE(v.as<int>() == 10);
+}
 
-        REQUIRE(counter == 2);
-    }
+TEST_CASE("Floating point setter", "[setters]")
+{
+    json::Value v;
+    v = 10.0;
+    REQUIRE(v.is<double>());
+    REQUIRE(v.as<double>() == 10.0);
+}
+
+TEST_CASE("String setter", "[setters]")
+{
+    json::Value v;
+    v = "s";
+    REQUIRE(v.is<json::String>());
+    REQUIRE(v.as<std::string>() == "s");
+}
+
+TEST_CASE("Char array setter", "[setters]")
+{
+    char s[] = "s";
+    json::Value v;
+    v = s;
+    REQUIRE(v.is<json::String>());
+    REQUIRE(v.as<std::string>() == "s");
+}
+
+TEST_CASE("Object setter", "[setters]")
+{
+    json::Value v;
+    v = json::Object{};
+    REQUIRE(v.is<json::Object>());
+    REQUIRE(v.as<json::Object>().empty());
+}
+
+TEST_CASE("Array setter", "[setters]")
+{
+    json::Value v;
+    v = json::Array{};
+    REQUIRE(v.is<json::Array>());
+    REQUIRE(v.as<json::Array>().empty());
+}
+
+TEST_CASE("Array push back", "[setters]")
+{
+    json::Value v;
+    v = json::Array{};
+    v.pushBack(10);
+    REQUIRE(!v.isEmpty());
+    REQUIRE(v.getSize() == 1);
+    REQUIRE(v[0].is<double>());
+}
+
+TEST_CASE("Boolean setter", "[setters]")
+{
+    json::Value v;
+    v = false;
+    REQUIRE(v.is<bool>());
+    REQUIRE_FALSE(v.as<bool>());
+}
+
+TEST_CASE("Zero float to bool cast", "[casts]")
+{
+    const json::Value v = 0.0;
+    REQUIRE_FALSE(v.as<bool>());
+}
+
+TEST_CASE("Positive float to bool cast", "[casts]")
+{
+    const json::Value v = 1.0;
+    REQUIRE(v.as<bool>());
+}
+
+TEST_CASE("Zero integer to bool cast", "[casts]")
+{
+    const json::Value v = 0;
+    REQUIRE_FALSE(v.as<bool>());
+}
+
+TEST_CASE("Positive integer to bool cast", "[casts]")
+{
+    const json::Value v = 1;
+    REQUIRE(v.as<bool>());
+}
+
+TEST_CASE("Mutable range loop", "[range_loop]")
+{
+    json::Value v = json::Array{json::Value{0}, json::Value{1}};
+
+    int counter = 0;
+
+    for (json::Value& i : v)
+        REQUIRE(i.as<int>() == counter++);
+
+    REQUIRE(counter == 2);
+}
+
+TEST_CASE("Constant range loop", "[range_loop]")
+{
+    const json::Value v = json::Array{json::Value{0}, json::Value{1}};
+
+    int counter = 0;
+
+    for (const json::Value& i : v)
+        REQUIRE(i.as<int>() == counter++);
+
+    REQUIRE(counter == 2);
 }
