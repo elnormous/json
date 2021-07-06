@@ -546,8 +546,6 @@ namespace json
                             ++iterator;
                         }
                     }
-                    else
-                        return std::pair(Value{std::stoll(value)}, iterator);
 
                     // parse exponent
                     if (iterator != end &&
