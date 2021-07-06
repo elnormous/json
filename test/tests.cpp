@@ -182,6 +182,7 @@ TEST_CASE("Integer constructor", "[constructors]")
 {
     const json::Value v = 10;
     REQUIRE(v.is<double>());
+    REQUIRE(v.is<int>());
     REQUIRE(v.as<int>() == 10);
 }
 
@@ -189,6 +190,7 @@ TEST_CASE("Floating point constructor", "[constructors]")
 {
     const json::Value v = 10.0;
     REQUIRE(v.is<double>());
+    REQUIRE(v.is<float>());
     REQUIRE(v.as<double>() == 10.0);
 }
 
@@ -196,6 +198,7 @@ TEST_CASE("String constructor", "[constructors]")
 {
     const json::Value v = "s";
     REQUIRE(v.is<json::String>());
+    REQUIRE(v.is<const char*>());
     REQUIRE(v.as<std::string>() == "s");
 }
 
