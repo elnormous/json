@@ -219,7 +219,6 @@ namespace json
         }
 
         template <typename T, typename std::enable_if_t<
-            std::is_same_v<T, char*> ||
             std::is_same_v<T, const char*>
         >* = nullptr>
         T as() const
