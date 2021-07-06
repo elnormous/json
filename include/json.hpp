@@ -87,7 +87,6 @@ namespace json
         }
 
         template <typename T, typename std::enable_if_t<
-            std::is_arithmetic_v<T> &&
             std::is_floating_point_v<T>
         >* = nullptr>
         Value& operator=(const T v) noexcept
@@ -97,7 +96,6 @@ namespace json
         }
 
         template <typename T, typename std::enable_if_t<
-            std::is_arithmetic_v<T> &&
             std::is_integral_v<T> &&
             !std::is_same_v<T, bool>
         >* = nullptr>
