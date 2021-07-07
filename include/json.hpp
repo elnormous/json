@@ -185,55 +185,27 @@ namespace json
                 throw TypeError{"Wrong type"};
         }
 
-        template <typename T, typename std::enable_if_t<std::is_same_v<T, Array>>* = nullptr>
+        template <typename T, typename std::enable_if_t<
+            std::is_same_v<T, Array> ||
+            std::is_same_v<T, Object> ||
+            std::is_same_v<T, String>
+        >* = nullptr>
         T& as()
         {
-            if (const auto p = std::get_if<Array>(&value))
+            if (const auto p = std::get_if<T>(&value))
                 return *p;
             else
                 throw TypeError{"Wrong type"};
         }
 
-        template <typename T, typename std::enable_if_t<std::is_same_v<T, Array>>* = nullptr>
+        template <typename T, typename std::enable_if_t<
+            std::is_same_v<T, Array> ||
+            std::is_same_v<T, Object> ||
+            std::is_same_v<T, String>
+        >* = nullptr>
         const T& as() const
         {
-            if (const auto p = std::get_if<Array>(&value))
-                return *p;
-            else
-                throw TypeError{"Wrong type"};
-        }
-
-        template <typename T, typename std::enable_if_t<std::is_same_v<T, Object>>* = nullptr>
-        T& as()
-        {
-            if (const auto p = std::get_if<Object>(&value))
-                return *p;
-            else
-                throw TypeError{"Wrong type"};
-        }
-
-        template <typename T, typename std::enable_if_t<std::is_same_v<T, Object>>* = nullptr>
-        const T& as() const
-        {
-            if (const auto p = std::get_if<Object>(&value))
-                return *p;
-            else
-                throw TypeError{"Wrong type"};
-        }
-
-        template <typename T, typename std::enable_if_t<std::is_same_v<T, String>>* = nullptr>
-        String& as()
-        {
-            if (const auto p = std::get_if<String>(&value))
-                return *p;
-            else
-                throw TypeError{"Wrong type"};
-        }
-
-        template <typename T, typename std::enable_if_t<std::is_same_v<T, String>>* = nullptr>
-        const String& as() const
-        {
-            if (const auto p = std::get_if<String>(&value))
+            if (const auto p = std::get_if<T>(&value))
                 return *p;
             else
                 throw TypeError{"Wrong type"};
