@@ -804,29 +804,27 @@ namespace json
 
             static void encode(const Value& value, std::string& result, bool whitespaces, size_t level = 0)
             {
-                const auto& v = value.getValue();
-
-                if (std::holds_alternative<std::nullptr_t>(v))
+                if (std::holds_alternative<std::nullptr_t>(value.getValue()))
                 {
                     result.insert(result.end(), {'n', 'u', 'l', 'l'});
                 }
-                else if (auto d = std::get_if<double>(&v))
+                else if (auto d = std::get_if<double>(&value.getValue()))
                 {
                     const auto str = std::to_string(*d);
                     result.insert(result.end(), str.begin(), str.end());
                 }
-                else if (auto i = std::get_if<std::int64_t>(&v))
+                else if (auto i = std::get_if<std::int64_t>(&value.getValue()))
                 {
                     const auto str = std::to_string(*i);
                     result.insert(result.end(), str.begin(), str.end());
                 }
-                else if (auto s = std::get_if<String>(&v))
+                else if (auto s = std::get_if<String>(&value.getValue()))
                 {
                     result.push_back('"');
                     encode(*s, result);
                     result.push_back('"');
                 }
-                else if (auto o = std::get_if<Object>(&v))
+                else if (auto o = std::get_if<Object>(&value.getValue()))
                 {
                     result.push_back('{');
                     if (whitespaces) result.push_back('\n');
@@ -846,7 +844,7 @@ namespace json
                     if (whitespaces) result.insert(result.end(), level, '\t');
                     result.push_back('}');
                 }
-                else if (auto a = std::get_if<Array>(&v))
+                else if (auto a = std::get_if<Array>(&value.getValue()))
                 {
                     result.push_back('[');
                     if (whitespaces) result.push_back('\n');
@@ -863,7 +861,7 @@ namespace json
                     if (whitespaces) result.insert(result.end(), level, '\t');
                     result.push_back(']');
                 }
-                else if (auto b = std::get_if<bool>(&v))
+                else if (auto b = std::get_if<bool>(&value.getValue()))
                 {
                     if (*b) result.insert(result.end(), {'t', 'r', 'u', 'e'});
                     else result.insert(result.end(), {'f', 'a', 'l', 's', 'e'});
