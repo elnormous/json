@@ -24,8 +24,4 @@ $(EXECUTABLE): $(OBJECTS)
 
 .PHONY: clean
 clean:
-ifeq ($(OS),Windows_NT)
-	-del /f /q "$(EXECUTABLE).exe" $(OBJECTS) $(DEPENDENCIES) *.gcda *gcno
-else
 	$(RM) $(EXECUTABLE) $(OBJECTS) $(DEPENDENCIES) $(EXECUTABLE).exe *.gcda *gcno
-endif
