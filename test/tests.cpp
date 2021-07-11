@@ -117,16 +117,23 @@ TEST_CASE("Encoding", "[encoding]")
         {"i", 1},
         {"f", 2.1F},
         {"s", "foo"},
-        {"b", true},
+        {"bf", false},
+        {"bt", true},
         {"a", json::Array{
             true, 1, 2.1F, "3",
             json::Array{1, 2, 3}}
         }
     };
 
-    REQUIRE(json::encode(d) == "{\"a\":[true,1,2.100000,\"3\",[1,2,3]],\"b\":true,\"f\":2.100000,\"i\":1,\"n\":null,\"s\":\"foo\"}");
+    SECTION("Without whitespaces")
+    {
+        REQUIRE(json::encode(d) == "{\"a\":[true,1,2.100000,\"3\",[1,2,3]],\"bf\":false,\"bt\":true,\"f\":2.100000,\"i\":1,\"n\":null,\"s\":\"foo\"}");
+    }
 
-    REQUIRE(json::encode(d, true) == "{\n\t\"a\":[\n\t\ttrue,\n\t\t1,\n\t\t2.100000,\n\t\t\"3\",\n\t\t[\n\t\t\t1,\n\t\t\t2,\n\t\t\t3\n\t\t]\n\t],\n\t\"b\":true,\n\t\"f\":2.100000,\n\t\"i\":1,\n\t\"n\":null,\n\t\"s\":\"foo\"\n}");
+    SECTION("With whitespaces")
+    {
+        REQUIRE(json::encode(d, true) == "{\n\t\"a\":[\n\t\ttrue,\n\t\t1,\n\t\t2.100000,\n\t\t\"3\",\n\t\t[\n\t\t\t1,\n\t\t\t2,\n\t\t\t3\n\t\t]\n\t],\n\t\"bf\":false,\n\t\"bt\":true,\n\t\"f\":2.100000,\n\t\"i\":1,\n\t\"n\":null,\n\t\"s\":\"foo\"\n}");
+    }
 }
 
 TEST_CASE("Byte", "[byte]")
