@@ -110,6 +110,13 @@ TEST_CASE("Parse escape sequence", "[parsing]")
     REQUIRE(d.as<std::string>() == "\b\f\n\r\t");
 }
 
+TEST_CASE("Null encoding", "[encoding]")
+{
+    const json::Value d = nullptr;
+
+    REQUIRE(json::encode(d) == "null");
+}
+
 TEST_CASE("Bool false encoding", "[encoding]")
 {
     const json::Value d = false;
@@ -143,6 +150,23 @@ TEST_CASE("String encoding", "[encoding]")
     const json::Value d = "a";
 
     REQUIRE(json::encode(d) == "\"a\"");
+}
+
+TEST_CASE("Array encoding", "[encoding]")
+{
+    const json::Value d = json::Array{
+        false, 1, "2"
+    };
+
+    SECTION("Without whitespaces")
+    {
+        REQUIRE(json::encode(d) == "[false,1,\"2\"]");
+    }
+
+    SECTION("With whitespaces")
+    {
+        REQUIRE(json::encode(d, true) == "[\n\tfalse,\n\t1,\n\t\"2\"\n]");
+    }
 }
 
 TEST_CASE("Object encoding", "[encoding]")
