@@ -110,23 +110,89 @@ TEST_CASE("Parse escape sequence", "[parsing]")
     REQUIRE(d.as<std::string>() == "\b\f\n\r\t");
 }
 
-TEST_CASE("Encoding", "[encoding]")
+TEST_CASE("Null encoding", "[encoding]")
+{
+    const json::Value d = nullptr;
+
+    REQUIRE(json::encode(d) == "null");
+}
+
+TEST_CASE("Bool false encoding", "[encoding]")
+{
+    const json::Value d = false;
+
+    REQUIRE(json::encode(d) == "false");
+}
+
+TEST_CASE("Bool true encoding", "[encoding]")
+{
+    const json::Value d = true;
+
+    REQUIRE(json::encode(d) == "true");
+}
+
+TEST_CASE("Integer encoding", "[encoding]")
+{
+    const json::Value d = 10;
+
+    REQUIRE(json::encode(d) == "10");
+}
+
+TEST_CASE("Float encoding", "[encoding]")
+{
+    const json::Value d = 10.0;
+
+    REQUIRE(json::encode(d) == "10.000000");
+}
+
+TEST_CASE("String encoding", "[encoding]")
+{
+    const json::Value d = "a";
+
+    REQUIRE(json::encode(d) == "\"a\"");
+}
+
+TEST_CASE("Array encoding", "[encoding]")
+{
+    const json::Value d = json::Array{
+        false, 1, "2"
+    };
+
+    SECTION("Without whitespaces")
+    {
+        REQUIRE(json::encode(d) == "[false,1,\"2\"]");
+    }
+
+    SECTION("With whitespaces")
+    {
+        REQUIRE(json::encode(d, true) == "[\n\tfalse,\n\t1,\n\t\"2\"\n]");
+    }
+}
+
+TEST_CASE("Object encoding", "[encoding]")
 {
     const json::Value d = json::Object{
         {"n", nullptr},
         {"i", 1},
         {"f", 2.1F},
         {"s", "foo"},
-        {"b", true},
+        {"bf", false},
+        {"bt", true},
         {"a", json::Array{
             true, 1, 2.1F, "3",
             json::Array{1, 2, 3}}
         }
     };
 
-    REQUIRE(json::encode(d) == "{\"a\":[true,1,2.100000,\"3\",[1,2,3]],\"b\":true,\"f\":2.100000,\"i\":1,\"n\":null,\"s\":\"foo\"}");
+    SECTION("Without whitespaces")
+    {
+        REQUIRE(json::encode(d) == "{\"a\":[true,1,2.100000,\"3\",[1,2,3]],\"bf\":false,\"bt\":true,\"f\":2.100000,\"i\":1,\"n\":null,\"s\":\"foo\"}");
+    }
 
-    REQUIRE(json::encode(d, true) == "{\n\t\"a\":[\n\t\ttrue,\n\t\t1,\n\t\t2.100000,\n\t\t\"3\",\n\t\t[\n\t\t\t1,\n\t\t\t2,\n\t\t\t3\n\t\t]\n\t],\n\t\"b\":true,\n\t\"f\":2.100000,\n\t\"i\":1,\n\t\"n\":null,\n\t\"s\":\"foo\"\n}");
+    SECTION("With whitespaces")
+    {
+        REQUIRE(json::encode(d, true) == "{\n\t\"a\":[\n\t\ttrue,\n\t\t1,\n\t\t2.100000,\n\t\t\"3\",\n\t\t[\n\t\t\t1,\n\t\t\t2,\n\t\t\t3\n\t\t]\n\t],\n\t\"bf\":false,\n\t\"bt\":true,\n\t\"f\":2.100000,\n\t\"i\":1,\n\t\"n\":null,\n\t\"s\":\"foo\"\n}");
+    }
 }
 
 TEST_CASE("Byte", "[byte]")
