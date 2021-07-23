@@ -161,6 +161,13 @@ TEST_CASE("Parse escape sequence", "[parsing]")
     REQUIRE(d.as<std::string>() == "\b\f\n\r\t");
 }
 
+TEST_CASE("Parse unicode escape sequence", "[parsing]")
+{
+    const json::Value d = json::parse("\"\\u0060\\u012a\\u12AB\"");
+    REQUIRE(d.is<json::String>());
+    REQUIRE(d.as<std::string>() == "\u0060\u012a\u12AB");
+}
+
 TEST_CASE("Null encoding", "[encoding]")
 {
     const json::Value d = nullptr;
