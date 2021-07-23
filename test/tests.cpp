@@ -43,6 +43,12 @@ TEST_CASE("Parse float with exponent only", "[parsing]")
     REQUIRE(e.as<float>() == Approx(10.0F));
 }
 
+TEST_CASE("Parse float with capital E exponent only", "[parsing]")
+{
+    const auto e = json::parse("1E1");
+    REQUIRE(e.as<float>() == Approx(10.0F));
+}
+
 TEST_CASE("Parse float with negative exponent", "[parsing]")
 {
     const auto e = json::parse("0.5e-1");
