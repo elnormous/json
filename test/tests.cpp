@@ -113,6 +113,13 @@ TEST_CASE("Parse object", "[parsing]")
     REQUIRE(d["d"].is<json::Object>());
 }
 
+TEST_CASE("Parse object with empty key", "[parsing]")
+{
+    const json::Value d = json::parse("{\"\":\"a\"}");
+    REQUIRE(d.is<json::Object>());
+    REQUIRE(d[""].as<std::string>() == "a");
+}
+
 TEST_CASE("Parse object with duplicate keys", "[parsing]")
 {
     const json::Value d = json::parse("{\"a\":\"a\",\"a\":\"b\"}");
