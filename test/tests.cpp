@@ -17,6 +17,13 @@ TEST_CASE("Parse integer", "[parsing]")
     REQUIRE(d.as<int>() == 10);
 }
 
+TEST_CASE("Parse negative integer", "[parsing]")
+{
+    const json::Value d = json::parse("-10");
+    REQUIRE(d.is<double>());
+    REQUIRE(d.as<int>() == -10);
+}
+
 TEST_CASE("Parse float", "[parsing]")
 {
     const json::Value d = json::parse("0.5");
