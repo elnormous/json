@@ -168,6 +168,13 @@ TEST_CASE("Parse unicode escape sequence", "[parsing]")
     REQUIRE(d.as<std::string>() == "\u0060\u012a\u12AB");
 }
 
+TEST_CASE("Parse unicode newline escape sequence", "[parsing]")
+{
+    const json::Value d = json::parse("\"\\u000A\"");
+    REQUIRE(d.is<json::String>());
+    REQUIRE(d.as<std::string>() == "\n");
+}
+
 TEST_CASE("Null encoding", "[encoding]")
 {
     const json::Value d = nullptr;
