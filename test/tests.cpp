@@ -281,6 +281,11 @@ TEST_CASE("Parse object error", "[errors]")
     REQUIRE_THROWS_AS(json::parse("{\"\"}"), json::ParseError);
 }
 
+TEST_CASE("Parse space error", "[errors]")
+{
+    REQUIRE_THROWS_AS(json::parse(" "), json::ParseError);
+}
+
 TEST_CASE("Null type error", "[errors]")
 {
     const json::Value v = nullptr;
