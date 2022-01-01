@@ -1,5 +1,3 @@
-// Copyright 2015-2019 Elviss Strazdins. All rights reserved.
-
 #ifndef JSON_HPP
 #define JSON_HPP
 
