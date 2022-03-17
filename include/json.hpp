@@ -1,5 +1,3 @@
-// Copyright 2015-2019 Elviss Strazdins. All rights reserved.
-
 #ifndef JSON_HPP
 #define JSON_HPP
 
@@ -709,7 +707,8 @@ namespace json
     template <class Data>
     Value parse(const Data& data)
     {
-        return parse(std::begin(data), std::end(data));
+        using std::begin, std::end; // add std::begin and std::end to lookup
+        return parse(begin(data), end(data));
     }
 
     inline std::string encode(const Value& value,
