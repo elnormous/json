@@ -359,7 +359,7 @@ namespace json
             {
                 const auto startIterator = hasByteOrderMark(begin, end) ? begin + 3 : begin;
                 const auto [result, valueIterator] = parseValue(startIterator, end);
-                if (const auto endIterator = skipWhitespaces(valueIterator, end); endIterator != end)
+                if (const auto endIterator = skipWhiteSpaces(valueIterator, end); endIterator != end)
                     throw ParseError{"Unexpected data"};
 
                 return result;
@@ -375,15 +375,15 @@ namespace json
                 return true;
             }
 
-            static constexpr bool isWhitespace(const char c) noexcept
+            static constexpr bool isWhiteSpace(const char c) noexcept
             {
                 return c == ' ' || c == '\t' || c == '\r' || c == '\n';
             }
 
-            static Iterator skipWhitespaces(Iterator begin, Iterator end)
+            static Iterator skipWhiteSpaces(Iterator begin, Iterator end)
             {
                 for (auto i = begin; i != end; ++i)
-                    if (!isWhitespace(static_cast<char>(*i))) return i;
+                    if (!isWhiteSpace(static_cast<char>(*i))) return i;
                 return end;
             }
 
@@ -407,7 +407,7 @@ namespace json
 
             static std::pair<Value, Iterator> parseValue(const Iterator begin, const Iterator end)
             {
-                Iterator iterator = skipWhitespaces(begin, end);
+                Iterator iterator = skipWhiteSpaces(begin, end);
 
                 if (iterator == end)
                     throw ParseError{"Unexpected end of data"};
@@ -420,7 +420,7 @@ namespace json
 
                     bool firstValue = true;
 
-                    while ((iterator = skipWhitespaces(iterator, end)) != end &&
+                    while ((iterator = skipWhiteSpaces(iterator, end)) != end &&
                            static_cast<char>(*iterator) != '}')
                     {
                         if (firstValue)
@@ -430,16 +430,16 @@ namespace json
                             if (static_cast<char>(*iterator++) != ',')
                                 throw ParseError{"Invalid object"};
 
-                            iterator = skipWhitespaces(iterator, end);
+                            iterator = skipWhiteSpaces(iterator, end);
                         }
 
                         const auto [key, stringIterator] = parseString(iterator, end);
-                        iterator = skipWhitespaces(stringIterator, end);
+                        iterator = skipWhiteSpaces(stringIterator, end);
 
                         if (static_cast<char>(*iterator++) != ':')
                             throw ParseError{"Invalid object"};
 
-                        iterator = skipWhitespaces(iterator, end);
+                        iterator = skipWhiteSpaces(iterator, end);
 
                         const auto [value, valueIterator] = parseValue(iterator, end);
                         iterator = valueIterator;
@@ -461,7 +461,7 @@ namespace json
 
                     bool firstValue = true;
 
-                    while ((iterator = skipWhitespaces(iterator, end)) != end &&
+                    while ((iterator = skipWhiteSpaces(iterator, end)) != end &&
                            static_cast<char>(*iterator) != ']')
                     {
                         if (firstValue)
@@ -471,7 +471,7 @@ namespace json
                             if (static_cast<char>(*iterator++) != ',')
                                 throw ParseError{"Invalid object"};
 
-                            iterator = skipWhitespaces(iterator, end);
+                            iterator = skipWhiteSpaces(iterator, end);
                         }
 
                         const auto [value, valueIterator] = parseValue(iterator, end);
@@ -712,20 +712,20 @@ namespace json
     }
 
     inline std::string encode(const Value& value,
-                              const bool whitespaces = false,
+                              const bool whiteSpaces = false,
                               const bool byteOrderMark = false)
     {
         class Encoder final
         {
         public:
             static std::string encode(const Value& value,
-                                      const bool whitespaces,
+                                      const bool whiteSpaces,
                                       const bool byteOrderMark)
             {
                 std::string result;
                 if (byteOrderMark) result.assign(utf8ByteOrderMark.begin(),
                                                  utf8ByteOrderMark.end());
-                encode(value, result, whitespaces);
+                encode(value, result, whiteSpaces);
                 return result;
             }
 
@@ -757,7 +757,7 @@ namespace json
             }
 
             static void encode(const Value& value, std::string& result,
-                               const bool whitespaces,
+                               const bool whiteSpaces,
                                const std::size_t level = 0)
             {
                 if (std::holds_alternative<std::nullptr_t>(value.getValue()))
@@ -783,38 +783,38 @@ namespace json
                 else if (auto o = std::get_if<Object>(&value.getValue()))
                 {
                     result.push_back('{');
-                    if (whitespaces) result.push_back('\n');
+                    if (whiteSpaces) result.push_back('\n');
 
                     for (auto entryIterator = o->begin(); entryIterator != o->end();)
                     {
                         const auto& [key, entryValue] = *entryIterator;
-                        if (whitespaces) result.insert(result.end(), level + 1, '\t');
+                        if (whiteSpaces) result.insert(result.end(), level + 1, '\t');
                         result.push_back('"');
                         encode(key, result);
                         result.insert(result.end(), {'"', ':'});
-                        encode(entryValue, result, whitespaces, level + 1);
+                        encode(entryValue, result, whiteSpaces, level + 1);
                         if (++entryIterator != o->end()) result.push_back(',');
-                        if (whitespaces) result.push_back('\n');
+                        if (whiteSpaces) result.push_back('\n');
                     }
 
-                    if (whitespaces) result.insert(result.end(), level, '\t');
+                    if (whiteSpaces) result.insert(result.end(), level, '\t');
                     result.push_back('}');
                 }
                 else if (auto a = std::get_if<Array>(&value.getValue()))
                 {
                     result.push_back('[');
-                    if (whitespaces) result.push_back('\n');
+                    if (whiteSpaces) result.push_back('\n');
 
                     for (auto entryIterator = a->begin(); entryIterator != a->end();)
                     {
                         const auto& entry = *entryIterator;
-                        if (whitespaces) result.insert(result.end(), level + 1, '\t');
-                        encode(entry, result, whitespaces, level + 1);
+                        if (whiteSpaces) result.insert(result.end(), level + 1, '\t');
+                        encode(entry, result, whiteSpaces, level + 1);
                         if (++entryIterator != a->end()) result.push_back(',');
-                        if (whitespaces) result.push_back('\n');
+                        if (whiteSpaces) result.push_back('\n');
                     }
 
-                    if (whitespaces) result.insert(result.end(), level, '\t');
+                    if (whiteSpaces) result.insert(result.end(), level, '\t');
                     result.push_back(']');
                 }
                 else if (auto b = std::get_if<bool>(&value.getValue()))
@@ -827,7 +827,7 @@ namespace json
             }
         };
 
-        return Encoder::encode(value, whitespaces, byteOrderMark);
+        return Encoder::encode(value, whiteSpaces, byteOrderMark);
     }
 } // namespace json
 
