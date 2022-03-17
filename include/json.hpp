@@ -272,7 +272,7 @@ namespace json
                 throw TypeError{"Wrong type"};
         }
 
-        Value& operator[](std::size_t index) &
+        Value& operator[](const std::size_t index) &
         {
             if (const auto p = std::get_if<Array>(&value))
             {
@@ -283,7 +283,7 @@ namespace json
                 throw TypeError{"Wrong type"};
         }
 
-        const Value& operator[](std::size_t index) const&
+        const Value& operator[](const std::size_t index) const&
         {
             if (const auto p = std::get_if<Array>(&value))
             {
@@ -357,7 +357,7 @@ namespace json
         class Parser final
         {
         public:
-            static Value parse(Iterator begin, Iterator end)
+            static Value parse(const Iterator begin, const Iterator end)
             {
                 const auto startIterator = hasByteOrderMark(begin, end) ? begin + 3 : begin;
                 const auto [result, valueIterator] = parseValue(startIterator, end);
@@ -368,13 +368,12 @@ namespace json
             }
 
         private:
-            static bool hasByteOrderMark(Iterator begin, Iterator end) noexcept
+            static bool hasByteOrderMark(const Iterator begin, const Iterator end) noexcept
             {
+                auto i = begin;
                 for (const auto b : utf8ByteOrderMark)
-                    if (begin == end || static_cast<std::uint8_t>(*begin) != b)
+                    if (begin == end || static_cast<std::uint8_t>(*i++) != b)
                         return false;
-                    else
-                        ++begin;
                 return true;
             }
 
@@ -390,7 +389,7 @@ namespace json
                 return end;
             }
 
-            static std::pair<bool, Iterator> isSame(Iterator begin, Iterator end,
+            static std::pair<bool, Iterator> isSame(const Iterator begin, const Iterator end,
                                                     const char* expectedBegin,
                                                     const char* expectedEnd)
             {
@@ -408,7 +407,7 @@ namespace json
                 return std::pair(true, iterator);
             }
 
-            static std::pair<Value, Iterator> parseValue(Iterator begin, Iterator end)
+            static std::pair<Value, Iterator> parseValue(const Iterator begin, const Iterator end)
             {
                 Iterator iterator = skipWhitespaces(begin, end);
 
@@ -603,7 +602,7 @@ namespace json
                 }
             }
 
-            static std::pair<std::string, Iterator> parseString(Iterator begin, Iterator end)
+            static std::pair<std::string, Iterator> parseString(const Iterator begin, const Iterator end)
             {
                 std::string result;
                 Iterator iterator = begin;
@@ -713,12 +712,16 @@ namespace json
         return parse(std::begin(data), std::end(data));
     }
 
-    inline std::string encode(const Value& value, bool whitespaces = false, bool byteOrderMark = false)
+    inline std::string encode(const Value& value,
+                              const bool whitespaces = false,
+                              const bool byteOrderMark = false)
     {
         class Encoder final
         {
         public:
-            static std::string encode(const Value& value, bool whitespaces, bool byteOrderMark)
+            static std::string encode(const Value& value,
+                                      const bool whitespaces,
+                                      const bool byteOrderMark)
             {
                 std::string result;
                 if (byteOrderMark) result.assign(utf8ByteOrderMark.begin(),
@@ -754,7 +757,9 @@ namespace json
                         result.push_back(c);
             }
 
-            static void encode(const Value& value, std::string& result, bool whitespaces, size_t level = 0)
+            static void encode(const Value& value, std::string& result,
+                               const bool whitespaces,
+                               const std::size_t level = 0)
             {
                 if (std::holds_alternative<std::nullptr_t>(value.getValue()))
                 {
