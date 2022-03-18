@@ -705,8 +705,7 @@ namespace json
         return Parser::parse(begin, end);
     }
 
-    [[nodiscard]]
-    inline Value parse(const char* data)
+    [[nodiscard]] inline Value parse(const char* data)
     {
         auto end = data;
         while (*end) ++end;
@@ -714,8 +713,7 @@ namespace json
     }
 
     template <class Data>
-    [[nodiscard]]
-    Value parse(const Data& data)
+    [[nodiscard]] Value parse(const Data& data)
     {
         using std::begin, std::end; // add std::begin and std::end to lookup
         return parse(begin(data), end(data));
