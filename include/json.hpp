@@ -355,6 +355,7 @@ namespace json
         class Parser final
         {
         public:
+            [[nodiscard]]
             static Value parse(const Iterator begin, const Iterator end)
             {
                 const auto startIterator = hasByteOrderMark(begin, end) ? begin + 3 : begin;
@@ -366,6 +367,7 @@ namespace json
             }
 
         private:
+            [[nodiscard]]
             static bool hasByteOrderMark(const Iterator begin, const Iterator end) noexcept
             {
                 auto i = begin;
@@ -375,11 +377,13 @@ namespace json
                 return true;
             }
 
+            [[nodiscard]]
             static constexpr bool isWhiteSpace(const char c) noexcept
             {
                 return c == ' ' || c == '\t' || c == '\r' || c == '\n';
             }
 
+            [[nodiscard]]
             static Iterator skipWhiteSpaces(Iterator begin, Iterator end)
             {
                 for (auto i = begin; i != end; ++i)
@@ -387,6 +391,7 @@ namespace json
                 return end;
             }
 
+            [[nodiscard]]
             static std::pair<bool, Iterator> isSame(const Iterator begin, const Iterator end,
                                                     const char* expectedBegin,
                                                     const char* expectedEnd)
@@ -405,6 +410,7 @@ namespace json
                 return std::pair(true, iterator);
             }
 
+            [[nodiscard]]
             static std::pair<Value, Iterator> parseValue(const Iterator begin, const Iterator end)
             {
                 Iterator iterator = skipWhiteSpaces(begin, end);
@@ -600,6 +606,7 @@ namespace json
                 }
             }
 
+            [[nodiscard]]
             static std::pair<std::string, Iterator> parseString(const Iterator begin, const Iterator end)
             {
                 std::string result;
@@ -697,6 +704,7 @@ namespace json
         return Parser::parse(begin, end);
     }
 
+    [[nodiscard]]
     inline Value parse(const char* data)
     {
         auto end = data;
@@ -705,12 +713,14 @@ namespace json
     }
 
     template <class Data>
+    [[nodiscard]]
     Value parse(const Data& data)
     {
         using std::begin, std::end; // add std::begin and std::end to lookup
         return parse(begin(data), end(data));
     }
 
+    [[nodiscard]]
     inline std::string encode(const Value& value,
                               const bool whiteSpaces = false,
                               const bool byteOrderMark = false)
@@ -718,6 +728,7 @@ namespace json
         class Encoder final
         {
         public:
+            [[nodiscard]]
             static std::string encode(const Value& value,
                                       const bool whiteSpaces,
                                       const bool byteOrderMark)
