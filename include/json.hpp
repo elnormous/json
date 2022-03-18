@@ -129,7 +129,7 @@ namespace json
             std::is_same_v<T, Object> ||
             std::is_same_v<T, String>
         >* = nullptr>
-        bool is() const noexcept
+        [[nodiscard]] bool is() const noexcept
         {
             return std::holds_alternative<T>(value);
         }
@@ -138,7 +138,7 @@ namespace json
             std::is_arithmetic_v<T> &&
             !std::is_same_v<T, bool>
         >* = nullptr>
-        bool is() const noexcept
+        [[nodiscard]] bool is() const noexcept
         {
             return std::holds_alternative<double>(value) ||
                 std::holds_alternative<std::int64_t>(value);
@@ -147,13 +147,13 @@ namespace json
         template <typename T, typename std::enable_if_t<
             std::is_same_v<T, const char*>
         >* = nullptr>
-        bool is() const noexcept
+        [[nodiscard]] bool is() const noexcept
         {
             return std::holds_alternative<std::string>(value);
         }
 
         template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T>>* = nullptr>
-        T as() const
+        [[nodiscard]] T as() const
         {
             if (const auto d = std::get_if<double>(&value))
                 return static_cast<T>(*d);
@@ -170,7 +170,7 @@ namespace json
             std::is_same_v<T, Object> ||
             std::is_same_v<T, String>
         >* = nullptr>
-        T& as()
+        [[nodiscard]] T& as()
         {
             if (const auto p = std::get_if<T>(&value))
                 return *p;
@@ -183,7 +183,7 @@ namespace json
             std::is_same_v<T, Object> ||
             std::is_same_v<T, String>
         >* = nullptr>
-        const T& as() const
+        [[nodiscard]] const T& as() const
         {
             if (const auto p = std::get_if<T>(&value))
                 return *p;
@@ -192,7 +192,7 @@ namespace json
         }
 
         template <typename T, typename std::enable_if_t<std::is_same_v<T, const char*>>* = nullptr>
-        T as() const
+        [[nodiscard]] T as() const
         {
             if (const auto p = std::get_if<String>(&value))
                 return p->c_str();
@@ -200,7 +200,7 @@ namespace json
                 throw TypeError{"Wrong type"};
         }
 
-        auto begin()
+        [[nodiscard]] auto begin()
         {
             if (const auto p = std::get_if<Array>(&value))
                 return p->begin();
@@ -208,7 +208,7 @@ namespace json
                 throw TypeError{"Wrong type"};
         }
 
-        auto end()
+        [[nodiscard]] auto end()
         {
             if (const auto p = std::get_if<Array>(&value))
                 return p->end();
@@ -216,7 +216,7 @@ namespace json
                 throw TypeError{"Wrong type"};
         }
 
-        auto begin() const
+        [[nodiscard]] auto begin() const
         {
             if (const auto p = std::get_if<Array>(&value))
                 return p->begin();
@@ -224,7 +224,7 @@ namespace json
                 throw TypeError{"Wrong type"};
         }
 
-        auto end() const
+        [[nodiscard]] auto end() const
         {
             if (const auto p = std::get_if<Array>(&value))
                 return p->end();
@@ -232,7 +232,7 @@ namespace json
                 throw TypeError{"Wrong type"};
         }
 
-        bool hasMember(std::string_view member) const
+        [[nodiscard]] bool hasMember(std::string_view member) const
         {
             if (const auto p = std::get_if<Object>(&value))
                 return p->find(member) != p->end();
@@ -240,7 +240,7 @@ namespace json
                 throw TypeError{"Wrong type"};
         }
 
-        Value& operator[](std::string_view member) &
+        [[nodiscard]] Value& operator[](std::string_view member) &
         {
             if (const auto p = std::get_if<Object>(&value))
             {
@@ -257,7 +257,7 @@ namespace json
                 throw TypeError{"Wrong type"};
         }
 
-        const Value& operator[](std::string_view member) const&
+        [[nodiscard]] const Value& operator[](std::string_view member) const&
         {
             if (const auto p = std::get_if<Object>(&value))
             {
@@ -270,7 +270,7 @@ namespace json
                 throw TypeError{"Wrong type"};
         }
 
-        Value& operator[](const std::size_t index) &
+        [[nodiscard]] Value& operator[](const std::size_t index) &
         {
             if (const auto p = std::get_if<Array>(&value))
             {
@@ -281,7 +281,7 @@ namespace json
                 throw TypeError{"Wrong type"};
         }
 
-        const Value& operator[](const std::size_t index) const&
+        [[nodiscard]] const Value& operator[](const std::size_t index) const&
         {
             if (const auto p = std::get_if<Array>(&value))
             {
@@ -294,7 +294,7 @@ namespace json
                 throw TypeError{"Wrong type"};
         }
 
-        bool isEmpty() const
+        [[nodiscard]] bool isEmpty() const
         {
             if (const auto p = std::get_if<Array>(&value))
                 return p->empty();
@@ -302,7 +302,7 @@ namespace json
                 throw TypeError{"Wrong type"};
         }
 
-        std::size_t getSize() const
+        [[nodiscard]] std::size_t getSize() const
         {
             if (const auto p = std::get_if<Array>(&value))
                 return p->size();
@@ -326,7 +326,7 @@ namespace json
                 throw TypeError{"Wrong type"};
         }
 
-        auto& getValue() const noexcept { return value; }
+        [[nodiscard]] auto& getValue() const noexcept { return value; }
 
     private:
         std::variant<
@@ -350,7 +350,7 @@ namespace json
     }
 
     template <class Iterator>
-    Value parse(Iterator begin, Iterator end)
+    [[nodiscard]] Value parse(Iterator begin, Iterator end)
     {
         class Parser final
         {
@@ -411,7 +411,8 @@ namespace json
             }
 
             [[nodiscard]]
-            static std::pair<Value, Iterator> parseValue(const Iterator begin, const Iterator end)
+            static std::pair<Value, Iterator> parseValue(const Iterator begin,
+                                                         const Iterator end)
             {
                 Iterator iterator = skipWhiteSpaces(begin, end);
 
