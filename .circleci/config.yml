@@ -22,7 +22,7 @@ jobs:
       - run:
           name: Generate coverage
           command: |
-            cd tests
+            cd test
             gcov main.cpp tests.cpp
       - sonarcloud/scan
 
