@@ -710,9 +710,7 @@ namespace json
 
     [[nodiscard]] inline Value parse(const char* data)
     {
-        auto end = data;
-        while (*end) ++end;
-        return parse(data, end);
+        return parse(data, data + std::strlen(data));
     }
 
     template <class Data>
